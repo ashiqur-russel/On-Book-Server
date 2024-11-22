@@ -13,6 +13,10 @@ export class ProductService {
     return products;
   }
 
+  async getProductById(productId: string): Promise<IProduct | null> {
+    return await Product.findById({ _id: productId });
+  }
+
   async createProduct(product: IProduct): Promise<IProduct> {
     const newProduct = await Product.create(product);
     return newProduct;
@@ -32,7 +36,7 @@ export class ProductService {
     return updatedProduct;
   }
 
-  private searchProduct(searchName: string): Promise<IProduct[]> {
+  private async searchProduct(searchName: string): Promise<IProduct[]> {
     return Product.find({
       $or: [
         { title: { $regex: searchName, $options: 'i' } },
@@ -40,5 +44,9 @@ export class ProductService {
         { category: { $regex: searchName, $options: 'i' } },
       ],
     });
+  }
+
+  async deleteProduct(productId: string): Promise<void> {
+    await Product.updateOne({ _id: productId }, { isDeleted: true });
   }
 }

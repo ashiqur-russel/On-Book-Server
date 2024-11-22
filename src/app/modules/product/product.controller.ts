@@ -20,6 +20,22 @@ export class ProductController {
     }
   }
 
+  async getProductById(req: Request, res: Response) {
+    const { productId } = req.params;
+    try {
+      const product = await productService.getProductById(productId);
+      res.status(200).json({
+        message: 'Book retrieved successfully',
+        status: true,
+        data: product,
+      });
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: 'Validation failed', success: false, error });
+    }
+  }
+
   async createProduct(req: Request, res: Response) {
     try {
       const product = await productService.createProduct(req.body);
@@ -47,6 +63,22 @@ export class ProductController {
         message: 'Book updated successfully',
         success: true,
         data: updatedProduct,
+      });
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: 'Validation failed', success: false, error });
+    }
+  }
+
+  async deleteProduct(req: Request, res: Response) {
+    const { productId } = req.params;
+    try {
+      await productService.deleteProduct(productId);
+      res.status(201).json({
+        message: 'Book deleted successfully',
+        success: true,
+        data: [],
       });
     } catch (error) {
       res
