@@ -2,8 +2,14 @@ import { Product } from './product.model';
 import { IProduct } from './product.interface';
 
 export class ProductService {
-  async getAllProducts(): Promise<IProduct[]> {
-    const products = await Product.find({});
+  async getAllProducts(searchTerm?: string): Promise<IProduct[]> {
+    let products = [];
+    if (searchTerm) {
+      products = await this.searchProduct(searchTerm);
+    } else {
+      products = await Product.find({});
+    }
+
     return products;
   }
 
@@ -24,5 +30,15 @@ export class ProductService {
     );
 
     return updatedProduct;
+  }
+
+  private searchProduct(searchName: string): Promise<IProduct[]> {
+    return Product.find({
+      $or: [
+        { title: { $regex: searchName, $options: 'i' } },
+        { author: { $regex: searchName, $options: 'i' } },
+        { category: { $regex: searchName, $options: 'i' } },
+      ],
+    });
   }
 }

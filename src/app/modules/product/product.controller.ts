@@ -5,8 +5,9 @@ const productService = new ProductService();
 
 export class ProductController {
   async getAllProducts(req: Request, res: Response) {
+    const searchTerm = req.query.searchTerm as string;
     try {
-      const products = await productService.getAllProducts();
+      const products = await productService.getAllProducts(searchTerm);
       res.status(200).json({
         message: 'Books retrieved successfully',
         status: true,
