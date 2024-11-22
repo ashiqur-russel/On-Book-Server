@@ -1,3 +1,4 @@
+import { Response } from 'express';
 import { Product } from './product.model';
 import { IProduct } from './product.interface';
 
@@ -50,9 +51,10 @@ export class ProductService {
     });
   }
 
-  // Delete a product by ID (soft delete)
-  async deleteProduct(productId: string): Promise<void> {
-    await Product.deleteOne({ _id: productId });
+  // Delete a product by ID
+  async deleteProduct(productId: string): Promise<boolean> {
+    const result = await Product.deleteOne({ _id: productId });
+    return result.deletedCount > 0;
   }
 }
 

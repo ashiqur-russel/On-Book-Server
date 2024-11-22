@@ -73,27 +73,64 @@ export class ProductController {
   async updateProduct(req: Request, res: Response) {
     const { productId } = req.params;
     const updateData = req.body;
+
+    // Validate ObjectId format
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      res.status(400).json({
+        message: 'Invalid product ID format',
+        success: false,
+      });
+    }
+
     try {
       const updatedProduct = await productService.updateProduct(
         productId,
         updateData,
       );
+
+      if (!updatedProduct) {
+        // If no product is found
+        res.status(404).json({
+          message: 'Book not found!',
+          success: false,
+        });
+      }
+
       res.status(201).json({
         message: 'Book updated successfully',
         success: true,
         data: updatedProduct,
       });
     } catch (error) {
-      res
-        .status(500)
-        .json({ message: 'Validation failed', success: false, error });
+      res.status(500).json({
+        message: 'An error occurred while updating the book',
+        success: false,
+        error: error.message || 'Unknown error',
+      });
     }
   }
 
   async deleteProduct(req: Request, res: Response) {
     const { productId } = req.params;
+
+    // Validate ObjectId format
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      res.status(400).json({
+        message: 'Invalid product ID format',
+        success: false,
+      });
+    }
+
     try {
-      await productService.deleteProduct(productId);
+      const deletedProduct = await productService.deleteProduct(productId);
+      if (!deletedProduct) {
+        // If no product is found
+        return res.status(404).json({
+          message: 'Book not found!',
+          success: false,
+        });
+      }
+
       res.status(201).json({
         message: 'Book deleted successfully',
         success: true,
