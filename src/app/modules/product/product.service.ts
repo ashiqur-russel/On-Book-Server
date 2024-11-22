@@ -13,16 +13,19 @@ export class ProductService {
     return products;
   }
 
+  // Fetch product by ID
   async getProductById(productId: string): Promise<IProduct | null> {
     return await Product.findById({ _id: productId });
   }
 
+  // Create a new product
   async createProduct(product: IProduct): Promise<IProduct> {
-    const newProduct = await Product.create(product);
-    return newProduct;
+    return await Product.create(product);
   }
 
+  // Update an existing product
   async updateProduct(productId: string, updateData: Partial<IProduct>) {
+    // set stock amount fale if quantity is 0
     if (updateData.quantity === 0) {
       updateData.inStock = false;
     }
@@ -30,12 +33,13 @@ export class ProductService {
     const updatedProduct = await Product.findByIdAndUpdate(
       productId,
       { $set: updateData },
-      { new: true },
+      { new: true, runValidators: true },
     );
 
     return updatedProduct;
   }
 
+  // query search service basen on title, author and category
   private async searchProduct(searchName: string): Promise<IProduct[]> {
     return Product.find({
       $or: [
@@ -46,6 +50,7 @@ export class ProductService {
     });
   }
 
+  // Delete a product by ID (soft delete)
   async deleteProduct(productId: string): Promise<void> {
     await Product.updateOne({ _id: productId }, { isDeleted: true });
   }

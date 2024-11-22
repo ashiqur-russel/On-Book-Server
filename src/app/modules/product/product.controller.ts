@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import productService from './product.service';
+import mongoose from 'mongoose';
 
 export class ProductController {
   async getAllProducts(req: Request, res: Response) {
@@ -20,17 +21,37 @@ export class ProductController {
 
   async getProductById(req: Request, res: Response) {
     const { productId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      res.status(400).json({
+        message: 'Invalid product ID format',
+        success: false,
+      });
+    }
+
     try {
       const product = await productService.getProductById(productId);
+
+      if (!product) {
+        // If no product is found
+        res.status(404).json({
+          message: 'Book not found!',
+          success: false,
+        });
+      }
+
       res.status(200).json({
         message: 'Book retrieved successfully',
-        status: true,
+        success: true,
         data: product,
       });
-    } catch (error) {
-      res
-        .status(500)
-        .json({ message: 'Validation failed', success: false, error });
+    } catch (error: any) {
+      // Generic server error
+      res.status(500).json({
+        message: 'An error occurred while retrieving the book',
+        success: false,
+        error: error.message || 'Unknown error',
+      });
     }
   }
 

@@ -4,6 +4,7 @@ import { Order } from './order.model';
 
 export class OrderService {
   async createOrder(data: IOrder): Promise<IOrder> {
+    // Create a new order
     const { email, quantity, product: productId, totalPrice } = data;
 
     // Fetch product details
@@ -41,7 +42,7 @@ export class OrderService {
     return order;
   }
 
-  // Service for calculate Revnue
+  // Calculate total revenue using aggregation
   async calculateRevenue(): Promise<number> {
     const result = await Order.aggregate([
       {

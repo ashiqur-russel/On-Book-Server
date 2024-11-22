@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import orderService from './order.service';
 
 export class OrderController {
+  // Create a new order
   async createOrder(req: Request, res: Response) {
     try {
       const order = await orderService.createOrder(req.body);
@@ -13,13 +14,15 @@ export class OrderController {
       });
     } catch (error) {
       res.status(400).json({
-        message: error.message,
+        message: 'Failed to create order!',
         status: false,
+        error: error.message,
       });
     }
   }
 
-  async calculateRevenue(req: Request, res: Response) {
+  // Get total revenue from orders
+  async getTotalRevenue(req: Request, res: Response) {
     try {
       const totalRevenue = await orderService.calculateRevenue();
 
@@ -32,8 +35,9 @@ export class OrderController {
       });
     } catch (error) {
       res.status(400).json({
-        message: error.message,
+        message: 'Failed to calculate revenue',
         status: false,
+        error: error.message,
       });
     }
   }
