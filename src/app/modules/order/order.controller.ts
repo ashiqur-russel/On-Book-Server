@@ -16,7 +16,7 @@ export class OrderController {
       res.status(400).json({
         message: 'Failed to create order!',
         status: false,
-        error: error.message,
+        error,
       });
     }
   }
@@ -37,7 +37,7 @@ export class OrderController {
       res.status(400).json({
         message: 'Failed to calculate revenue',
         status: false,
-        error: error.message,
+        error,
       });
     }
   }

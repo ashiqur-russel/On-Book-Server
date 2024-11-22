@@ -46,11 +46,11 @@ export class ProductController {
         data: product,
       });
     } catch (error) {
-      // Generic server error
+      // Handle typed error
       res.status(500).json({
         message: 'An error occurred while retrieving the book',
         success: false,
-        error: error.message || 'Unknown error',
+        error,
       });
     }
   }
@@ -105,7 +105,7 @@ export class ProductController {
       res.status(500).json({
         message: 'An error occurred while updating the book',
         success: false,
-        error: error.message || 'Unknown error',
+        error,
       });
     }
   }
