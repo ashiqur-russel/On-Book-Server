@@ -45,7 +45,7 @@ export class ProductController {
         success: true,
         data: product,
       });
-    } catch (error: any) {
+    } catch (error) {
       // Generic server error
       res.status(500).json({
         message: 'An error occurred while retrieving the book',
@@ -125,7 +125,7 @@ export class ProductController {
       const deletedProduct = await productService.deleteProduct(productId);
       if (!deletedProduct) {
         // If no product is found
-        return res.status(404).json({
+        res.status(404).json({
           message: 'Book not found!',
           success: false,
         });

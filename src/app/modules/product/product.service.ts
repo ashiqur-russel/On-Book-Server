@@ -1,4 +1,3 @@
-import { Response } from 'express';
 import { Product } from './product.model';
 import { IProduct } from './product.interface';
 
