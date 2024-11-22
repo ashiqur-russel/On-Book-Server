@@ -52,7 +52,7 @@ export class ProductService {
 
   // Delete a product by ID (soft delete)
   async deleteProduct(productId: string): Promise<void> {
-    await Product.updateOne({ _id: productId }, { isDeleted: true });
+    await Product.deleteOne({ _id: productId });
   }
 }
 

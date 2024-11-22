@@ -35,20 +35,10 @@ export const ProductSchema: Schema<IProduct> = new Schema(
       required: true,
       default: true,
     },
-    isDeleted: {
-      type: Boolean,
-      required: true,
-      default: false,
-    },
   },
   {
     timestamps: true,
   },
 );
-
-ProductSchema.pre('find', function (next) {
-  this.find({ isDeleted: { $ne: true } });
-  next();
-});
 
 export const Product = mongoose.model<IProduct>('Product', ProductSchema);
