@@ -50,3 +50,6 @@ export class ProductService {
     await Product.updateOne({ _id: productId }, { isDeleted: true });
   }
 }
+
+const productService = new ProductService();
+export default productService;

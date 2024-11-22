@@ -1,7 +1,5 @@
 import { Request, Response } from 'express';
-import { ProductService } from './product.service';
-
-const productService = new ProductService();
+import productService from './product.service';
 
 export class ProductController {
   async getAllProducts(req: Request, res: Response) {
