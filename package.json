@@ -4,6 +4,7 @@
   "description": "Next Level Course Assignemnt No 2.",
   "main": "index.js",
   "scripts": {
+    "start": "node ./dist/server.js",
     "start:prod": "node ./dist/server.js",
     "start:dev": "ts-node-dev --respawn --transpile-only src/server.ts && format",
     "build": "tsc",
