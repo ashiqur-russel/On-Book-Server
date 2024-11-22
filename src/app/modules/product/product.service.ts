@@ -13,10 +13,14 @@ export class ProductService {
   }
 
   async updateProduct(productId: string, updateData: Partial<IProduct>) {
+    if (updateData.quantity === 0) {
+      updateData.inStock = false;
+    }
+
     const updatedProduct = await Product.findByIdAndUpdate(
       productId,
       { $set: updateData },
-      { new: true, runValidators: true },
+      { new: true },
     );
 
     return updatedProduct;
