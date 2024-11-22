@@ -1,6 +1,9 @@
-export type TCategory = {
-  category: 'Fiction' | 'Science' | 'SelfDevelopment' | 'Poetry' | 'Religious';
-};
+export type TCategory =
+  | 'Fiction'
+  | 'Science'
+  | 'SelfDevelopment'
+  | 'Poetry'
+  | 'Religious';
 
 export interface IProduct {
   title: string;
@@ -8,8 +11,6 @@ export interface IProduct {
   price: number;
   category: TCategory;
   description: string;
-  quantity: string;
+  quantity: number;
   inStock: boolean;
-  createdAt: Date;
-  updatedAt: Date;
 }
