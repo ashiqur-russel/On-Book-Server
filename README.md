@@ -15,21 +15,21 @@ The Book Store REST-API is an Express-based application designed to manage books
 
 ## ✨ Features
 
-### Products
+### Products(Book)
 
-- Create: Add new books with properties such as title, author, price, category, description, quantity, and stock status.
-- Retrieve: Fetch all books or filter them by title, author, or category.
-- Retrieve Specific Book: Get details of a specific book using its unique ID.
-- Update: Modify book details like price, quantity, and stock status.
-- Delete: Soft-delete books, marking them as unavailable without permanently removing them.
+- Create new product with properties such as title, author, price, category, description, quantity, and stock status.
+- Fetch all product or filter them by title, author, or category.
+- Retrieve specific product details of a specific book using its unique ID.
+- Update book details like price, quantity, and stock status.
+- Delete books, marking them as unavailable without permanently removing them.
 
 ### Orders
 
-- Place an Order: Create orders by specifying customer email, product ID, and quantity.
-- Inventory Management: Automatically reduce product quantity after an order and update the stock status (inStock).
-- Revenue Calculation: Aggregate total revenue from all orders using MongoDB.
+- Create orders by specifying customer email, product ID, and quantity.
+- Automatically reduce product quantity after an order and update the stock status (inStock).
+- Revenue Calculation.
 
-## Data Flow Diagram
+## Data Flow 
 
 The following diagram represents the flow of data and interactions:
 
@@ -46,13 +46,13 @@ The following diagram represents the flow of data and interactions:
  <div align="center">
     <h3>Products</h2>
 
-| Method   | URI              | Action                                        |
-| -------- | ---------------- | --------------------------------------------- |
-| `POST`   | `/api/products`  | Create a new book                             |
-| `GET`    | `/api/products`  | Retrieve all books, filterable by searchTerm  |
-| `GET`    | `/api/productId` | Retrieve details of a specific book by its ID |
-| `PUT`    | `/api/productId` | Update details of a specific book by its ID   |
-| `DELETE` | `/api/productId` | Soft-delete a specific book by its ID         |
+| Method   | URI                       | Action                                        |
+| -------- | ------------------------- | --------------------------------------------- |
+| `POST`   | `/api/products`           | Create a new book                             |
+| `GET`    | `/api/products`           | Retrieve all books, filterable by searchTerm  |
+| `GET`    | `/api/products/productId` | Retrieve details of a specific book by its ID |
+| `PUT`    | `/api/products/productId` | Update details of a specific book by its ID   |
+| `DELETE` | `/api/products/productId` | Soft-delete a specific book by its ID         |
 
 </div>
 
