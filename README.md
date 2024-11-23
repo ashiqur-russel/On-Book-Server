@@ -112,10 +112,3 @@ Now you are set to go and can interact with the API endpoints.
 [mongoose_img]: https://img.shields.io/badge/Mongoose-880000?style=for-the-badge
 [mongoose_url]: https://mongoosejs.com/
 
-```
-
-```
-
-```
-
-```
