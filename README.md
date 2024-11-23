@@ -46,13 +46,13 @@ The following diagram represents the flow of data and interactions:
  <div align="center">
     <h3>Products</h2>
 
-| Method   | URI                       | Action                                        |
-| -------- | ------------------------- | --------------------------------------------- |
-| `POST`   | `/api/products`           | Create a new book                             |
-| `GET`    | `/api/products`           | Retrieve all books, filterable by searchTerm  |
-| `GET`    | `/api/products/productId` | Retrieve details of a specific book by its ID |
-| `PUT`    | `/api/products/productId` | Update details of a specific book by its ID   |
-| `DELETE` | `/api/products/productId` | Soft-delete a specific book by its ID         |
+| Method   | URI                        | Action                                        |
+| -------- | -------------------------- | --------------------------------------------- |
+| `POST`   | `/api/products`            | Create a new book                             |
+| `GET`    | `/api/products`            | Retrieve all books, filterable by searchTerm  |
+| `GET`    | `/api/products/:productId` | Retrieve details of a specific book by its ID |
+| `PUT`    | `/api/products/:productId` | Update details of a specific book by its ID   |
+| `DELETE` | `/api/products/:productId` | Soft-delete a specific book by its ID         |
 
 </div>
 
