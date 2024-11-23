@@ -3,8 +3,12 @@ import { IProduct } from './product.interface';
 
 export const ProductSchema: Schema<IProduct> = new Schema(
   {
-    title: { type: String, required: [true, 'Title is required'] },
-    author: { type: String, required: [true, 'Author is required'] },
+    title: { type: String, trim: true, required: [true, 'Title is required'] },
+    author: {
+      type: String,
+      trim: true,
+      required: [true, 'Author is required'],
+    },
     price: {
       type: Number,
       required: [true, 'Price is required'],
@@ -24,7 +28,11 @@ export const ProductSchema: Schema<IProduct> = new Schema(
         message: '{VALUE} is not a valid category',
       },
     },
-    description: { type: String, required: [true, 'Description is required'] },
+    description: {
+      type: String,
+      trim: true,
+      required: [true, 'Description is required'],
+    },
     quantity: {
       type: Number,
       required: [true, 'Quantity is required'],
@@ -40,5 +48,13 @@ export const ProductSchema: Schema<IProduct> = new Schema(
     timestamps: true,
   },
 );
+ProductSchema.pre('save', function (next) {
+  if (this.quantity === 0) {
+    this.inStock = false;
+  } else {
+    this.inStock = true;
+  }
+  next();
+});
 
 export const Product = mongoose.model<IProduct>('Product', ProductSchema);

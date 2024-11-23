@@ -1,16 +1,22 @@
+import mongoose from 'mongoose';
 import productService from '../product/product.service';
 import { IOrder } from './order.interface';
 import { Order } from './order.model';
 
 export class OrderService {
   async createOrder(data: IOrder): Promise<IOrder> {
-    // Create a new order
     const { email, quantity, product: productId, totalPrice } = data;
+
+    // Validate productId
+    if (!mongoose.Types.ObjectId.isValid(productId.toString())) {
+      throw new Error('Invalid product ID.');
+    }
 
     // Fetch product details
     const productData = await productService.getProductById(
       productId.toString(),
     );
+
     if (!productData) {
       throw new Error('Product not found.');
     }

@@ -13,10 +13,11 @@ export class OrderController {
         data: order,
       });
     } catch (error) {
+      const err = error as Error;
       res.status(400).json({
-        message: 'Failed to create order!',
+        message: err.message,
         status: false,
-        error,
+        error: err,
       });
     }
   }

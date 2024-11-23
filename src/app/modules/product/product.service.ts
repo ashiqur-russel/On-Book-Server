@@ -24,12 +24,35 @@ export class ProductService {
   }
 
   // Update an existing product
-  async updateProduct(productId: string, updateData: Partial<IProduct>) {
-    // set stock amount fale if quantity is 0
-    if (updateData.quantity === 0) {
-      updateData.inStock = false;
+  async updateProduct(
+    productId: string,
+    updateData: Partial<IProduct>,
+  ): Promise<IProduct | null> {
+    // Fetch the current product details
+    const product = await this.getProductById(productId);
+
+    if (!product) {
+      throw new Error('Product not found.');
     }
 
+    // Check if quantity is being updated
+    if (updateData.quantity !== undefined) {
+      if (updateData.quantity < 0) {
+        throw new Error('Quantity cannot be negative.');
+      }
+
+      // Validate stock availability for reduction
+      if (updateData.quantity < product.quantity) {
+        throw new Error(
+          `Insufficient stock. Only ${product.quantity} items are available for this product.`,
+        );
+      }
+
+      // Automatically set inStock to false if quantity is 0
+      updateData.inStock = updateData.quantity > 0;
+    }
+
+    // Update the product
     const updatedProduct = await Product.findByIdAndUpdate(
       productId,
       { $set: updateData },

@@ -64,9 +64,11 @@ export class ProductController {
         data: product,
       });
     } catch (error) {
+      const err = error as Error;
+
       res
         .status(500)
-        .json({ message: 'Validation failed', success: false, error });
+        .json({ message: err.name as string, success: false, err });
     }
   }
 
