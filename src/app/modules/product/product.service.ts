@@ -3,7 +3,7 @@ import { IProduct } from './product.interface';
 import { NotFoundError } from '../../utils/errors';
 import mongoose from 'mongoose';
 
-export class ProductService {
+class ProductService {
   // Retrieve all the products
   async getAllProducts(searchTerm?: string): Promise<IProduct[]> {
     let products = [];

@@ -1,7 +1,8 @@
 import { Request, Response } from 'express';
 import productService from './product.service';
 
-export class ProductController {
+class ProductController {
+  // Retirve all the products from database created
   async getAllProducts(req: Request, res: Response) {
     const searchTerm = req.query.searchTerm as string;
     try {
@@ -18,7 +19,7 @@ export class ProductController {
     }
   }
 
-  // Fetch product by id (done)
+  // Fetch product by id
   async getProductById(req: Request, res: Response) {
     const { productId } = req.params;
 
@@ -48,6 +49,7 @@ export class ProductController {
     }
   }
 
+  // Create product
   async createProduct(req: Request, res: Response) {
     try {
       const product = await productService.createProduct(req.body);
@@ -108,7 +110,7 @@ export class ProductController {
     }
   }
 
-  // Delete product using product id (done)
+  // Delete product using product id
   async deleteProduct(req: Request, res: Response) {
     const { productId } = req.params;
 
@@ -126,6 +128,8 @@ export class ProductController {
         res.status(404).json({
           message: err.message,
           success: false,
+          err,
+          stack: err.stack,
         });
       } else {
         res.status(500).json({

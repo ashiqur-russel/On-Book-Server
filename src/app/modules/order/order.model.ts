@@ -25,6 +25,7 @@ const OrderSchema: Schema<IOrder> = new Schema(
   },
   {
     timestamps: true,
+    versionKey: false,
     toJSON: { virtuals: false },
     toObject: { virtuals: true },
   },
