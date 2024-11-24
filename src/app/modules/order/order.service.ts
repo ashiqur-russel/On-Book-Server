@@ -10,7 +10,7 @@ export class OrderService {
 
     // Validate productId format
     if (!mongoose.Types.ObjectId.isValid(productId.toString())) {
-      throw new NotFoundError('Invalid product ID.');
+      throw new ValidationError('Invalid product ID.');
     }
 
     // Fetch product data
