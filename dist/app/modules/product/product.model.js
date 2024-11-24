@@ -26,8 +26,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Product = exports.ProductSchema = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
 exports.ProductSchema = new mongoose_1.Schema({
-    title: { type: String, required: [true, 'Title is required'] },
-    author: { type: String, required: [true, 'Author is required'] },
+    title: { type: String, trim: true, required: [true, 'Title is required'] },
+    author: {
+        type: String,
+        trim: true,
+        required: [true, 'Author is required'],
+    },
     price: {
         type: Number,
         required: [true, 'Price is required'],
@@ -47,7 +51,11 @@ exports.ProductSchema = new mongoose_1.Schema({
             message: '{VALUE} is not a valid category',
         },
     },
-    description: { type: String, required: [true, 'Description is required'] },
+    description: {
+        type: String,
+        trim: true,
+        required: [true, 'Description is required'],
+    },
     quantity: {
         type: Number,
         required: [true, 'Quantity is required'],
@@ -60,5 +68,15 @@ exports.ProductSchema = new mongoose_1.Schema({
     },
 }, {
     timestamps: true,
+    versionKey: false,
+});
+exports.ProductSchema.pre('save', function (next) {
+    if (this.quantity === 0) {
+        this.inStock = false;
+    }
+    else {
+        this.inStock = true;
+    }
+    next();
 });
 exports.Product = mongoose_1.default.model('Product', exports.ProductSchema);

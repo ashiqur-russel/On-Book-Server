@@ -27,11 +27,21 @@ class OrderController {
                 });
             }
             catch (error) {
-                res.status(400).json({
-                    message: 'Failed to create order!',
-                    status: false,
-                    error,
-                });
+                const err = error;
+                if (err.name === 'ValidationError') {
+                    res.status(400).json({
+                        message: 'Validation Failed',
+                        status: false,
+                        err,
+                        stack: err.stack,
+                    });
+                }
+                else {
+                    res.status(404).json({
+                        message: err.message,
+                        status: false,
+                    });
+                }
             }
         });
     }

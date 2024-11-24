@@ -14,11 +14,20 @@ export class OrderController {
       });
     } catch (error) {
       const err = error as Error;
-      res.status(400).json({
-        message: err.message,
-        status: false,
-        error: err,
-      });
+
+      if (err.name === 'ValidationError') {
+        res.status(400).json({
+          message: 'Validation Failed',
+          status: false,
+          err,
+          stack: err.stack,
+        });
+      } else {
+        res.status(404).json({
+          message: err.message,
+          status: false,
+        });
+      }
     }
   }
 

@@ -1,7 +1,10 @@
 import { Product } from './product.model';
 import { IProduct } from './product.interface';
+import { NotFoundError } from '../../utils/errors';
+import mongoose from 'mongoose';
 
 export class ProductService {
+  // Retrieve all the products
   async getAllProducts(searchTerm?: string): Promise<IProduct[]> {
     let products = [];
     if (searchTerm) {
@@ -15,7 +18,18 @@ export class ProductService {
 
   // Fetch product by ID
   async getProductById(productId: string): Promise<IProduct | null> {
-    return await Product.findById({ _id: productId });
+    // Validate productId format
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      throw new NotFoundError('Invalid product ID.');
+    }
+
+    const product = await Product.findOne({ _id: productId });
+
+    if (!product) {
+      throw new NotFoundError('Product is Not Found');
+    }
+
+    return product;
   }
 
   // Create a new product
@@ -28,7 +42,6 @@ export class ProductService {
     productId: string,
     updateData: Partial<IProduct>,
   ): Promise<IProduct | null> {
-    // Fetch the current product details
     const product = await this.getProductById(productId);
 
     if (!product) {
@@ -39,13 +52,6 @@ export class ProductService {
     if (updateData.quantity !== undefined) {
       if (updateData.quantity < 0) {
         throw new Error('Quantity cannot be negative.');
-      }
-
-      // Validate stock availability for reduction
-      if (updateData.quantity < product.quantity) {
-        throw new Error(
-          `Insufficient stock. Only ${product.quantity} items are available for this product.`,
-        );
       }
 
       // Automatically set inStock to false if quantity is 0
@@ -74,9 +80,18 @@ export class ProductService {
   }
 
   // Delete a product by ID
-  async deleteProduct(productId: string): Promise<boolean> {
-    const result = await Product.deleteOne({ _id: productId });
-    return result.deletedCount > 0;
+  async deleteProduct(productId: string): Promise<void> {
+    // Validate productId format
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      throw new NotFoundError('Invalid product ID.');
+    }
+
+    const product = await Product.findOne({ _id: productId });
+
+    if (!product) {
+      throw new NotFoundError('Product is Not Found');
+    }
+    await Product.deleteOne({ _id: productId });
   }
 }
 

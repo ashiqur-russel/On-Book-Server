@@ -14,7 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProductController = void 0;
 const product_service_1 = __importDefault(require("./product.service"));
-const mongoose_1 = __importDefault(require("mongoose"));
 class ProductController {
     getAllProducts(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -34,24 +33,12 @@ class ProductController {
             }
         });
     }
+    // Fetch product by id (done)
     getProductById(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { productId } = req.params;
-            if (!mongoose_1.default.Types.ObjectId.isValid(productId)) {
-                res.status(400).json({
-                    message: 'Invalid product ID format',
-                    success: false,
-                });
-            }
             try {
                 const product = yield product_service_1.default.getProductById(productId);
-                if (!product) {
-                    // If no product is found
-                    res.status(404).json({
-                        message: 'Book not found!',
-                        success: false,
-                    });
-                }
                 res.status(200).json({
                     message: 'Book retrieved successfully',
                     success: true,
@@ -59,12 +46,21 @@ class ProductController {
                 });
             }
             catch (error) {
-                // Handle typed error
-                res.status(500).json({
-                    message: 'An error occurred while retrieving the book',
-                    success: false,
-                    error,
-                });
+                const err = error;
+                if (err.name !== 'ValidationError') {
+                    res.status(404).json({
+                        message: err.message,
+                        success: false,
+                    });
+                }
+                else {
+                    res.status(500).json({
+                        message: err.message,
+                        status: false,
+                        err,
+                        stack: err.stack,
+                    });
+                }
             }
         });
     }
@@ -79,32 +75,31 @@ class ProductController {
                 });
             }
             catch (error) {
-                res
-                    .status(500)
-                    .json({ message: 'Validation failed', success: false, error });
+                const err = error;
+                if (err.name !== 'ValidationError') {
+                    res.status(500).json({
+                        message: err.message,
+                        success: false,
+                    });
+                }
+                else {
+                    res.status(400).json({
+                        message: 'Validation failed',
+                        success: false,
+                        error,
+                        stack: err.stack,
+                    });
+                }
             }
         });
     }
+    // update product data; partial data also could be updated
     updateProduct(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { productId } = req.params;
             const updateData = req.body;
-            // Validate ObjectId format
-            if (!mongoose_1.default.Types.ObjectId.isValid(productId)) {
-                res.status(400).json({
-                    message: 'Invalid product ID format',
-                    success: false,
-                });
-            }
             try {
                 const updatedProduct = yield product_service_1.default.updateProduct(productId, updateData);
-                if (!updatedProduct) {
-                    // If no product is found
-                    res.status(404).json({
-                        message: 'Book not found!',
-                        success: false,
-                    });
-                }
                 res.status(201).json({
                     message: 'Book updated successfully',
                     success: true,
@@ -112,43 +107,52 @@ class ProductController {
                 });
             }
             catch (error) {
-                res.status(500).json({
-                    message: 'An error occurred while updating the book',
-                    success: false,
-                    error,
-                });
-            }
-        });
-    }
-    deleteProduct(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { productId } = req.params;
-            // Validate ObjectId format
-            if (!mongoose_1.default.Types.ObjectId.isValid(productId)) {
-                res.status(400).json({
-                    message: 'Invalid product ID format',
-                    success: false,
-                });
-            }
-            try {
-                const deletedProduct = yield product_service_1.default.deleteProduct(productId);
-                if (!deletedProduct) {
-                    // If no product is found
+                const err = error;
+                if (err.name !== 'ValidationError') {
                     res.status(404).json({
-                        message: 'Book not found!',
+                        message: err.message,
                         success: false,
                     });
                 }
+                else {
+                    res.status(500).json({
+                        message: 'Validation failed',
+                        success: false,
+                        error,
+                        stack: err.stack,
+                    });
+                }
+            }
+        });
+    }
+    // Delete product using product id (done)
+    deleteProduct(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { productId } = req.params;
+            try {
+                yield product_service_1.default.deleteProduct(productId);
                 res.status(201).json({
                     message: 'Book deleted successfully',
                     success: true,
-                    data: [],
+                    data: {},
                 });
             }
             catch (error) {
-                res
-                    .status(500)
-                    .json({ message: 'Validation failed', success: false, error });
+                const err = error;
+                if (err.name !== 'ValidationError') {
+                    res.status(404).json({
+                        message: err.message,
+                        success: false,
+                    });
+                }
+                else {
+                    res.status(500).json({
+                        message: err.message,
+                        status: false,
+                        err,
+                        stack: err.stack,
+                    });
+                }
             }
         });
     }

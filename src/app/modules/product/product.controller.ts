@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import productService from './product.service';
-import mongoose from 'mongoose';
 
 export class ProductController {
   async getAllProducts(req: Request, res: Response) {
@@ -19,26 +18,12 @@ export class ProductController {
     }
   }
 
+  // Fetch product by id (done)
   async getProductById(req: Request, res: Response) {
     const { productId } = req.params;
 
-    if (!mongoose.Types.ObjectId.isValid(productId)) {
-      res.status(400).json({
-        message: 'Invalid product ID format',
-        success: false,
-      });
-    }
-
     try {
       const product = await productService.getProductById(productId);
-
-      if (!product) {
-        // If no product is found
-        res.status(404).json({
-          message: 'Book not found!',
-          success: false,
-        });
-      }
 
       res.status(200).json({
         message: 'Book retrieved successfully',
@@ -46,12 +31,20 @@ export class ProductController {
         data: product,
       });
     } catch (error) {
-      // Handle typed error
-      res.status(500).json({
-        message: 'An error occurred while retrieving the book',
-        success: false,
-        error,
-      });
+      const err = error as Error;
+      if (err.name !== 'ValidationError') {
+        res.status(404).json({
+          message: err.message,
+          success: false,
+        });
+      } else {
+        res.status(500).json({
+          message: err.message,
+          status: false,
+          err,
+          stack: err.stack,
+        });
+      }
     }
   }
 
@@ -65,24 +58,26 @@ export class ProductController {
       });
     } catch (error) {
       const err = error as Error;
-
-      res
-        .status(500)
-        .json({ message: err.name as string, success: false, err });
+      if (err.name !== 'ValidationError') {
+        res.status(500).json({
+          message: err.message,
+          success: false,
+        });
+      } else {
+        res.status(400).json({
+          message: 'Validation failed',
+          success: false,
+          error,
+          stack: err.stack,
+        });
+      }
     }
   }
 
+  // update product data; partial data also could be updated
   async updateProduct(req: Request, res: Response) {
     const { productId } = req.params;
     const updateData = req.body;
-
-    // Validate ObjectId format
-    if (!mongoose.Types.ObjectId.isValid(productId)) {
-      res.status(400).json({
-        message: 'Invalid product ID format',
-        success: false,
-      });
-    }
 
     try {
       const updatedProduct = await productService.updateProduct(
@@ -90,58 +85,56 @@ export class ProductController {
         updateData,
       );
 
-      if (!updatedProduct) {
-        // If no product is found
-        res.status(404).json({
-          message: 'Book not found!',
-          success: false,
-        });
-      }
-
       res.status(201).json({
         message: 'Book updated successfully',
         success: true,
         data: updatedProduct,
       });
     } catch (error) {
-      res.status(500).json({
-        message: 'An error occurred while updating the book',
-        success: false,
-        error,
-      });
+      const err = error as Error;
+      if (err.name !== 'ValidationError') {
+        res.status(404).json({
+          message: err.message,
+          success: false,
+        });
+      } else {
+        res.status(500).json({
+          message: 'Validation failed',
+          success: false,
+          error,
+          stack: err.stack,
+        });
+      }
     }
   }
 
+  // Delete product using product id (done)
   async deleteProduct(req: Request, res: Response) {
     const { productId } = req.params;
 
-    // Validate ObjectId format
-    if (!mongoose.Types.ObjectId.isValid(productId)) {
-      res.status(400).json({
-        message: 'Invalid product ID format',
-        success: false,
-      });
-    }
-
     try {
-      const deletedProduct = await productService.deleteProduct(productId);
-      if (!deletedProduct) {
-        // If no product is found
-        res.status(404).json({
-          message: 'Book not found!',
-          success: false,
-        });
-      }
+      await productService.deleteProduct(productId);
 
       res.status(201).json({
         message: 'Book deleted successfully',
         success: true,
-        data: [],
+        data: {},
       });
     } catch (error) {
-      res
-        .status(500)
-        .json({ message: 'Validation failed', success: false, error });
+      const err = error as Error;
+      if (err.name !== 'ValidationError') {
+        res.status(404).json({
+          message: err.message,
+          success: false,
+        });
+      } else {
+        res.status(500).json({
+          message: err.message,
+          status: false,
+          err,
+          stack: err.stack,
+        });
+      }
     }
   }
 }

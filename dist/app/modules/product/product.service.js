@@ -8,10 +8,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProductService = void 0;
 const product_model_1 = require("./product.model");
+const errors_1 = require("../../utils/errors");
+const mongoose_1 = __importDefault(require("mongoose"));
 class ProductService {
+    // Retrieve all the products
     getAllProducts(searchTerm) {
         return __awaiter(this, void 0, void 0, function* () {
             let products = [];
@@ -27,7 +33,15 @@ class ProductService {
     // Fetch product by ID
     getProductById(productId) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield product_model_1.Product.findById({ _id: productId });
+            // Validate productId format
+            if (!mongoose_1.default.Types.ObjectId.isValid(productId)) {
+                throw new errors_1.NotFoundError('Invalid product ID.');
+            }
+            const product = yield product_model_1.Product.findOne({ _id: productId });
+            if (!product) {
+                throw new errors_1.NotFoundError('Product is Not Found');
+            }
+            return product;
         });
     }
     // Create a new product
@@ -39,10 +53,19 @@ class ProductService {
     // Update an existing product
     updateProduct(productId, updateData) {
         return __awaiter(this, void 0, void 0, function* () {
-            // set stock amount fale if quantity is 0
-            if (updateData.quantity === 0) {
-                updateData.inStock = false;
+            const product = yield this.getProductById(productId);
+            if (!product) {
+                throw new Error('Product not found.');
             }
+            // Check if quantity is being updated
+            if (updateData.quantity !== undefined) {
+                if (updateData.quantity < 0) {
+                    throw new Error('Quantity cannot be negative.');
+                }
+                // Automatically set inStock to false if quantity is 0
+                updateData.inStock = updateData.quantity > 0;
+            }
+            // Update the product
             const updatedProduct = yield product_model_1.Product.findByIdAndUpdate(productId, { $set: updateData }, { new: true, runValidators: true });
             return updatedProduct;
         });
@@ -62,8 +85,15 @@ class ProductService {
     // Delete a product by ID
     deleteProduct(productId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield product_model_1.Product.deleteOne({ _id: productId });
-            return result.deletedCount > 0;
+            // Validate productId format
+            if (!mongoose_1.default.Types.ObjectId.isValid(productId)) {
+                throw new errors_1.NotFoundError('Invalid product ID.');
+            }
+            const product = yield product_model_1.Product.findOne({ _id: productId });
+            if (!product) {
+                throw new errors_1.NotFoundError('Product is Not Found');
+            }
+            yield product_model_1.Product.deleteOne({ _id: productId });
         });
     }
 }

@@ -29,7 +29,7 @@ The Book Store REST-API is an Express-based application designed to manage books
 - Automatically reduce product quantity after an order and update the stock status (inStock).
 - Revenue Calculation.
 
-## Data Flow 
+## Data Flow
 
 The following diagram represents the flow of data and interactions:
 
@@ -111,4 +111,3 @@ Now you are set to go and can interact with the API endpoints.
 [mongodb_url]: https://www.mongodb.com/
 [mongoose_img]: https://img.shields.io/badge/Mongoose-880000?style=for-the-badge
 [mongoose_url]: https://mongoosejs.com/
-

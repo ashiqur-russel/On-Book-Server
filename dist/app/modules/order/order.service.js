@@ -13,23 +13,32 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.OrderService = void 0;
+const mongoose_1 = __importDefault(require("mongoose"));
 const product_service_1 = __importDefault(require("../product/product.service"));
 const order_model_1 = require("./order.model");
+const errors_1 = require("../../utils/errors");
 class OrderService {
     createOrder(data) {
         return __awaiter(this, void 0, void 0, function* () {
-            // Create a new order
             const { email, quantity, product: productId, totalPrice } = data;
-            // Fetch product details
+            // Validate productId format
+            if (!mongoose_1.default.Types.ObjectId.isValid(productId.toString())) {
+                throw new errors_1.NotFoundError('Invalid product ID.');
+            }
+            // Fetch product data
             const productData = yield product_service_1.default.getProductById(productId.toString());
             if (!productData) {
-                throw new Error('Product not found.');
+                throw new errors_1.NotFoundError('Product is Not Found');
             }
-            // Check inventory stock
+            // Check if the product is in stock
+            if (!productData.inStock) {
+                throw new errors_1.ValidationError('This product is out of stock.');
+            }
+            // Check inventory availability
             if (productData.quantity < quantity) {
-                throw new Error('Insufficient stock for this product.');
+                throw new errors_1.ValidationError('Insufficient stock for this product.');
             }
-            // Update product inventory
+            // Update stock
             const updatedQuantity = productData.quantity - quantity;
             const isInStock = updatedQuantity > 0;
             yield product_service_1.default.updateProduct(productId.toString(), {
@@ -43,7 +52,7 @@ class OrderService {
                 quantity,
                 totalPrice,
             };
-            const order = yield order_model_1.Order.create(Object.assign({}, orderData));
+            const order = yield order_model_1.Order.create(orderData);
             return order;
         });
     }

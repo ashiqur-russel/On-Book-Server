@@ -46,8 +46,10 @@ export const ProductSchema: Schema<IProduct> = new Schema(
   },
   {
     timestamps: true,
+    versionKey: false,
   },
 );
+
 ProductSchema.pre('save', function (next) {
   if (this.quantity === 0) {
     this.inStock = false;

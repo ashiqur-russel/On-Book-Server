@@ -2,31 +2,37 @@ import mongoose from 'mongoose';
 import productService from '../product/product.service';
 import { IOrder } from './order.interface';
 import { Order } from './order.model';
+import { NotFoundError, ValidationError } from '../../utils/errors';
 
 export class OrderService {
   async createOrder(data: IOrder): Promise<IOrder> {
     const { email, quantity, product: productId, totalPrice } = data;
 
-    // Validate productId
+    // Validate productId format
     if (!mongoose.Types.ObjectId.isValid(productId.toString())) {
-      throw new Error('Invalid product ID.');
+      throw new NotFoundError('Invalid product ID.');
     }
 
-    // Fetch product details
+    // Fetch product data
     const productData = await productService.getProductById(
       productId.toString(),
     );
 
     if (!productData) {
-      throw new Error('Product not found.');
+      throw new NotFoundError('Product is Not Found');
     }
 
-    // Check inventory stock
+    // Check if the product is in stock
+    if (!productData.inStock) {
+      throw new ValidationError('This product is out of stock.');
+    }
+
+    // Check inventory availability
     if (productData.quantity < quantity) {
-      throw new Error('Insufficient stock for this product.');
+      throw new ValidationError('Insufficient stock for this product.');
     }
 
-    // Update product inventory
+    // Update stock
     const updatedQuantity = productData.quantity - quantity;
     const isInStock = updatedQuantity > 0;
 
@@ -43,7 +49,7 @@ export class OrderService {
       totalPrice,
     };
 
-    const order = await Order.create({ ...orderData });
+    const order = await Order.create(orderData);
 
     return order;
   }
