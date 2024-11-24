@@ -1,3 +1,7 @@
+export interface ICustomError extends Error {
+  statusCode?: number;
+}
+
 export class NotFoundError extends Error {
   constructor(message: string) {
     super(message);
@@ -5,9 +9,12 @@ export class NotFoundError extends Error {
   }
 }
 
-export class ValidationError extends Error {
-  constructor(message: string) {
+export class CustomError extends Error implements ICustomError {
+  statusCode?: number;
+
+  constructor(message: string, statusCode?: number) {
     super(message);
-    this.name = 'ValidationError';
+    this.statusCode = statusCode;
+    this.name = this.constructor.name;
   }
 }

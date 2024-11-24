@@ -53,6 +53,7 @@ class ProductController {
   async createProduct(req: Request, res: Response) {
     try {
       const product = await productService.createProduct(req.body);
+
       res.status(201).json({
         message: 'Book created successfully',
         success: true,
