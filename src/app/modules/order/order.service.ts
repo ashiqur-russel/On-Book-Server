@@ -58,27 +58,9 @@ export class OrderService {
   async calculateRevenue(): Promise<number> {
     const result = await Order.aggregate([
       {
-        $lookup: {
-          from: 'products',
-          localField: 'product',
-          foreignField: '_id',
-          as: 'productDetails',
-        },
-      },
-      {
-        $unwind: '$productDetails',
-      },
-      {
-        $project: {
-          revenue: {
-            $multiply: ['$productDetails.price', '$quantity'],
-          },
-        },
-      },
-      {
         $group: {
           _id: null,
-          totalRevenue: { $sum: '$revenue' },
+          totalRevenue: { $sum: '$totalPrice' },
         },
       },
     ]);
