@@ -15,6 +15,9 @@ app.use((0, cors_1.default)());
 app.use('/api/products', product_route_1.default);
 app.use('/api/orders', order_route_1.default);
 app.get('/', (req, res) => {
-    res.send('Server is up and running!');
+    res.status(200).json({
+        message: 'Server is up and running!',
+        api_start_point: '/api',
+    });
 });
 exports.default = app;

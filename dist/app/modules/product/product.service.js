@@ -12,7 +12,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ProductService = void 0;
 const product_model_1 = require("./product.model");
 const errors_1 = require("../../utils/errors");
 const mongoose_1 = __importDefault(require("mongoose"));
@@ -55,7 +54,7 @@ class ProductService {
         return __awaiter(this, void 0, void 0, function* () {
             const product = yield this.getProductById(productId);
             if (!product) {
-                throw new Error('Product not found.');
+                throw new errors_1.NotFoundError('Product not found.');
             }
             // Check if quantity is being updated
             if (updateData.quantity !== undefined) {
@@ -97,6 +96,5 @@ class ProductService {
         });
     }
 }
-exports.ProductService = ProductService;
 const productService = new ProductService();
 exports.default = productService;

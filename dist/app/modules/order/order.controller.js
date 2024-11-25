@@ -40,6 +40,8 @@ class OrderController {
                     res.status(404).json({
                         message: err.message,
                         status: false,
+                        err,
+                        stack: err.stack,
                     });
                 }
             }

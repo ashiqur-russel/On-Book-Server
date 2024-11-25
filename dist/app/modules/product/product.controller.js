@@ -12,9 +12,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ProductController = void 0;
 const product_service_1 = __importDefault(require("./product.service"));
 class ProductController {
+    // Retirve all the products from database created
     getAllProducts(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const searchTerm = req.query.searchTerm;
@@ -33,7 +33,7 @@ class ProductController {
             }
         });
     }
-    // Fetch product by id (done)
+    // Fetch product by id
     getProductById(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { productId } = req.params;
@@ -64,6 +64,7 @@ class ProductController {
             }
         });
     }
+    // Create product
     createProduct(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -125,7 +126,7 @@ class ProductController {
             }
         });
     }
-    // Delete product using product id (done)
+    // Delete product using product id
     deleteProduct(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { productId } = req.params;
@@ -143,6 +144,8 @@ class ProductController {
                     res.status(404).json({
                         message: err.message,
                         success: false,
+                        err,
+                        stack: err.stack,
                     });
                 }
                 else {
@@ -157,6 +160,5 @@ class ProductController {
         });
     }
 }
-exports.ProductController = ProductController;
 const productController = new ProductController();
 exports.default = productController;

@@ -32,11 +32,11 @@ class OrderService {
             }
             // Check if the product is in stock
             if (!productData.inStock) {
-                throw new errors_1.ValidationError('This product is out of stock.');
+                throw new errors_1.NotFoundError('This product is out of stock.');
             }
             // Check inventory availability
             if (productData.quantity < quantity) {
-                throw new errors_1.ValidationError('Insufficient stock for this product.');
+                throw new errors_1.NotFoundError('Insufficient stock for this product.');
             }
             // Update stock
             const updatedQuantity = productData.quantity - quantity;
@@ -62,27 +62,9 @@ class OrderService {
             var _a;
             const result = yield order_model_1.Order.aggregate([
                 {
-                    $lookup: {
-                        from: 'products',
-                        localField: 'product',
-                        foreignField: '_id',
-                        as: 'productDetails',
-                    },
-                },
-                {
-                    $unwind: '$productDetails',
-                },
-                {
-                    $project: {
-                        revenue: {
-                            $multiply: ['$productDetails.price', '$quantity'],
-                        },
-                    },
-                },
-                {
                     $group: {
                         _id: null,
-                        totalRevenue: { $sum: '$revenue' },
+                        totalRevenue: { $sum: '$totalPrice' },
                     },
                 },
             ]);
