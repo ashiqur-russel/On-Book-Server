@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import productService from '../product/product.service';
 import { IOrder } from './order.interface';
 import { Order } from './order.model';
-import { CustomError, NotFoundError } from '../../utils/errors';
+import { NotFoundError } from '../../utils/errors';
 
 export class OrderService {
   async createOrder(data: IOrder): Promise<IOrder> {
@@ -10,7 +10,7 @@ export class OrderService {
 
     // Validate productId format
     if (!mongoose.Types.ObjectId.isValid(productId.toString())) {
-      throw new CustomError('Invalid product ID.');
+      throw new NotFoundError('Invalid product ID.');
     }
 
     // Fetch product data
@@ -24,12 +24,12 @@ export class OrderService {
 
     // Check if the product is in stock
     if (!productData.inStock) {
-      throw new CustomError('This product is out of stock.');
+      throw new NotFoundError('This product is out of stock.');
     }
 
     // Check inventory availability
     if (productData.quantity < quantity) {
-      throw new CustomError('Insufficient stock for this product.');
+      throw new NotFoundError('Insufficient stock for this product.');
     }
 
     // Update stock

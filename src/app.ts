@@ -14,7 +14,10 @@ app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 
 app.get('/', (req, res) => {
-  res.send('Server is up and running!');
+  res.status(200).json({
+    message: 'Server is up and running!',
+    api_start_point: '/api',
+  });
 });
 
 export default app;

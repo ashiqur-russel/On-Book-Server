@@ -1,6 +1,6 @@
 import { Product } from './product.model';
 import { IProduct } from './product.interface';
-import { CustomError, NotFoundError } from '../../utils/errors';
+import { NotFoundError } from '../../utils/errors';
 import mongoose from 'mongoose';
 
 class ProductService {
@@ -20,7 +20,7 @@ class ProductService {
   async getProductById(productId: string): Promise<IProduct | null> {
     // Validate productId format
     if (!mongoose.Types.ObjectId.isValid(productId)) {
-      throw new CustomError('Invalid product ID.');
+      throw new NotFoundError('Invalid product ID.');
     }
 
     const product = await Product.findOne({ _id: productId });
