@@ -5,9 +5,9 @@ import sendResponse from '../../utils/sendResponse';
 import httpStatus from 'http-status';
 
 const registerUser = catchAsync(async (req, res) => {
-  const userData: IUser = req.body;
+  const { user: userData } = req.body;
 
-  const result = await UserServices.createUser(userData);
+  const result = await UserServices.createUser(userData as IUser);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
