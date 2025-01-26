@@ -1,19 +1,19 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import cors from 'cors';
-import productRoutes from './app/modules/product/product.route';
-import orderRoutes from './app/modules/order/order.route';
+import router from './app/routes';
+import cookieParser from 'cookie-parser';
 
 const app = express();
 
 // Middlewares
 app.use(express.json());
 app.use(cors());
+app.use(cookieParser());
 
 //Routes
-app.use('/api/products', productRoutes);
-app.use('/api/orders', orderRoutes);
+app.use('/api', router);
 
-app.get('/', (req, res) => {
+app.get('/', (req: Request, res: Response) => {
   res.status(200).json({
     message: 'Server is up and running!',
     api_start_point: '/api',

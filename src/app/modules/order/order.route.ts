@@ -6,4 +6,4 @@ const router = Router();
 router.post('/', orderController.createOrder);
 router.get('/revenue', orderController.getTotalRevenue);
 
-export default router;
+export const OrderRouters = router;
