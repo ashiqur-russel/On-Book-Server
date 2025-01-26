@@ -6,9 +6,14 @@ import { NotFoundError } from '../../utils/errors';
 
 export class OrderService {
   async createOrder(data: IOrder): Promise<IOrder> {
-    const { email, quantity, product: productId, totalPrice } = data;
+    const { email, quantity, product: productId, totalPrice, user } = data;
 
-    // Validate productId format
+    // Validate user ID format
+    if (!mongoose.Types.ObjectId.isValid(user.toString())) {
+      throw new NotFoundError('Invalid user ID.');
+    }
+
+    // Validate product ID format
     if (!mongoose.Types.ObjectId.isValid(productId.toString())) {
       throw new NotFoundError('Invalid product ID.');
     }
@@ -19,7 +24,7 @@ export class OrderService {
     );
 
     if (!productData) {
-      throw new NotFoundError('Product is Not Found');
+      throw new NotFoundError('Product is not found.');
     }
 
     // Check if the product is in stock
@@ -45,6 +50,7 @@ export class OrderService {
     const orderData: Partial<IOrder> = {
       email,
       product: productId,
+      user,
       quantity,
       totalPrice,
     };

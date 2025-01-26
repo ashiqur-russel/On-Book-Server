@@ -1,8 +1,9 @@
-import mongoose from 'mongoose';
+import { Types } from 'mongoose';
 
 export interface IOrder {
   email: string;
-  product: mongoose.Schema.Types.ObjectId;
+  product: Types.ObjectId;
+  user: Types.ObjectId;
   quantity: number;
   totalPrice: number;
   createdAt?: Date;

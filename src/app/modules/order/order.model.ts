@@ -8,8 +8,12 @@ const OrderSchema: Schema<IOrder> = new Schema(
       required: [true, 'Email is required.'],
       match: [/.+@.+\..+/, 'Invalid email format.'],
     },
+    user: {
+      type: Schema.Types.ObjectId,
+      required: [true, 'User ID is required.'],
+    },
     product: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       required: [true, 'Product ID is required.'],
     },
     totalPrice: {

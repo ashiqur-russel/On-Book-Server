@@ -4,8 +4,10 @@ import { IProduct } from './product.interface';
 export const ProductSchema: Schema<IProduct> = new Schema(
   {
     title: { type: String, trim: true, required: [true, 'Title is required'] },
+
     author: {
-      type: String,
+      type: Schema.Types.ObjectId,
+      ref: 'Author',
       trim: true,
       required: [true, 'Author is required'],
     },
