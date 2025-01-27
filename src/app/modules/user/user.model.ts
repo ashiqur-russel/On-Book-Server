@@ -46,7 +46,6 @@ userSchema.post('save', function (doc, next) {
 });
 
 userSchema.statics.isUserExist = async function (email: string) {
-  console.log('on model=>', email);
   return await User.findOne({ email }).select('+password');
 };
 
