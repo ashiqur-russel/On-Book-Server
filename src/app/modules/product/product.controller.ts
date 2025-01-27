@@ -6,8 +6,7 @@ import httpStatus from 'http-status';
 
 // Retirve all the products from database created
 const getAllProducts = catchAsync(async (req: Request, res: Response) => {
-  const searchTerm = req.query.searchTerm as string;
-  const products = await productService.getAllProducts(searchTerm);
+  const products = await productService.getAllProducts(req.query);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

@@ -2,22 +2,35 @@ import { Product } from './product.model';
 import { IProduct } from './product.interface';
 import { NotFoundError } from '../../utils/errors';
 import mongoose from 'mongoose';
+import QueryBuilder from '../../builder/QueryBuilder';
+import { ProductSearchableFields } from './prodcut.constant';
+import { User } from '../user/user.model';
 
-// Retrieve all the products
-const getAllProducts = async (searchTerm?: string): Promise<IProduct[]> => {
-  let products = [];
-  if (searchTerm) {
-    products = await searchProduct(searchTerm);
-  } else {
-    products = await Product.find({});
+const getAllProducts = async (
+  query: Record<string, unknown>,
+): Promise<IProduct[]> => {
+  if (query.author && typeof query.author === 'string') {
+    const user = await User.findOne({ name: query.author });
+    if (user) {
+      query.author = user._id;
+    } else {
+      throw new Error(`User with name "${query.author}" not found.`);
+    }
   }
 
-  return products;
+  const productQuery = new QueryBuilder(Product.find(), query)
+    .search(ProductSearchableFields.filter((field) => field !== 'author')) // Exclude 'author' from $regex
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const result = await productQuery.modelQuery;
+
+  return result;
 };
 
-// Fetch product by ID
 const getProductById = async (productId: string): Promise<IProduct | null> => {
-  // Validate productId format
   if (!mongoose.Types.ObjectId.isValid(productId)) {
     throw new NotFoundError('Invalid product ID.');
   }
@@ -31,12 +44,10 @@ const getProductById = async (productId: string): Promise<IProduct | null> => {
   return product;
 };
 
-// Create a new product
 const createProduct = async (product: IProduct): Promise<IProduct> => {
   return await Product.create(product);
 };
 
-// Update an existing product
 const updateProduct = async (
   productId: string,
   updateData: Partial<IProduct>,
@@ -67,18 +78,25 @@ const updateProduct = async (
   return updatedProduct;
 };
 
-// query search service basen on title, author and category
+/**
+ * @deprecated This function is deprecated as of 2025-01-27.
+ * Use the new `getAllProducts` method with advanced filtering and search instead.
+ *
+ * @param searchName - The name or term to search for in the products.
+ * @returns A promise that resolves to an array of products matching the search term.
+ */
 const searchProduct = async (searchName: string): Promise<IProduct[]> => {
   return Product.find({
     $or: [
       { title: { $regex: searchName, $options: 'i' } },
-      { author: { $regex: searchName, $options: 'i' } },
       { category: { $regex: searchName, $options: 'i' } },
     ],
+  }).populate({
+    path: 'author',
+    match: { name: { $regex: searchName, $options: 'i' } },
   });
 };
 
-// Delete a product by ID
 const deleteProduct = async (productId: string): Promise<void> => {
   // Validate productId format
   if (!mongoose.Types.ObjectId.isValid(productId)) {
