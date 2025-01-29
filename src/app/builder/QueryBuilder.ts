@@ -30,12 +30,30 @@ class QueryBuilder<T> {
   filter() {
     const queryObj = { ...this.query };
 
-    // Filtering
-    const excludeFields = ['searchTerm', 'sort', 'limit', 'page', 'fields'];
-
+    // Exclude special fields
+    const excludeFields = [
+      'searchTerm',
+      'sort',
+      'limit',
+      'page',
+      'fields',
+      'minPrice',
+      'maxPrice',
+    ];
     excludeFields.forEach((el) => delete queryObj[el]);
 
     this.modelQuery = this.modelQuery.find(queryObj as FilterQuery<T>);
+
+    // Price Range Filtering
+    if (this.query.minPrice || this.query.maxPrice) {
+      const minPrice = Number(this.query.minPrice) || 0;
+      const maxPrice = Number(this.query.maxPrice) || Infinity;
+
+      this.modelQuery = this.modelQuery
+        .where('totalPrice')
+        .gte(minPrice)
+        .lte(maxPrice);
+    }
 
     return this;
   }

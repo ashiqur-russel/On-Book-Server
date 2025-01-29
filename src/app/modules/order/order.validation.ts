@@ -19,6 +19,7 @@ const createOrderValidationSchema = z.object({
     totalPrice: z
       .number()
       .min(0, { message: 'Total price must be a non-negative number.' }),
+    status: z.enum(['pending', 'completed']).optional().default('pending'),
   }),
 });
 
@@ -46,6 +47,7 @@ const updateOrderValidationSchema = z.object({
       .number()
       .min(0, { message: 'Total price must be a non-negative number.' })
       .optional(),
+    status: z.enum(['pending', 'completed']).optional(),
   }),
 });
 

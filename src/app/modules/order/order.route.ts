@@ -6,19 +6,26 @@ import AuthGuard from '../../middlewares/authGuard';
 import { USER_ROLE } from '../user/user.constant';
 
 const router = Router();
+router.get(
+  '/',
+  AuthGuard(USER_ROLE.admin, USER_ROLE.user),
+  orderControllers.getAllOrders,
+);
 
 router.post(
   '/',
-  AuthGuard(USER_ROLE.user),
+  AuthGuard(USER_ROLE.user, USER_ROLE.admin),
   validateRequest(OrderValidation.createOrderValidationSchema),
   orderControllers.createOrder,
 );
+
 router.patch(
   '/:orderId',
   AuthGuard(USER_ROLE.user),
   validateRequest(OrderValidation.updateOrderValidationSchema),
   orderControllers.updateOrder,
 );
+
 router.get(
   '/revenue',
   AuthGuard(USER_ROLE.admin),

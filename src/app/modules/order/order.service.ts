@@ -4,13 +4,51 @@ import { Order } from './order.model';
 import { Product } from '../product/product.model';
 import AppError from '../../errors/handleAppError';
 import httpStatus from 'http-status';
+import QueryBuilder from '../../builder/QueryBuilder';
+
+const getAllOrders = async (query: Record<string, unknown>) => {
+  const orderQuery = new QueryBuilder(Order.find(), query)
+    .search(['email', 'status'])
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  if (query.status && typeof query.status === 'string') {
+    orderQuery.modelQuery = orderQuery.modelQuery.find({
+      status: query.status,
+    });
+  }
+  if (query.minPrice || query.maxPrice) {
+    const minPrice = Number(query.minPrice) || 0;
+    const maxPrice = Number(query.maxPrice) || Infinity;
+
+    orderQuery.modelQuery = orderQuery.modelQuery
+      .where('totalPrice')
+      .gte(minPrice)
+      .lte(maxPrice);
+  }
+
+  const orders = await orderQuery.modelQuery
+    .populate('product', 'title price')
+    .populate('user', 'name email');
+
+  return orders;
+};
 
 const createOrder = async (data: IOrder): Promise<IOrder> => {
   const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
-    const { email, quantity, product: productId, totalPrice, user } = data;
+    const {
+      email,
+      quantity,
+      product: productId,
+      totalPrice,
+      user,
+      status,
+    } = data;
 
     if (!mongoose.Types.ObjectId.isValid(user.toString())) {
       throw new AppError(httpStatus.BAD_REQUEST, 'Invalid user ID.');
@@ -20,9 +58,8 @@ const createOrder = async (data: IOrder): Promise<IOrder> => {
       throw new AppError(httpStatus.BAD_REQUEST, 'Invalid product ID.');
     }
 
-    const product = await Product.findById({ _id: productId }, session).session(
-      session,
-    );
+    // Find the product (Fix: Correcting findById method)
+    const product = await Product.findById(productId).session(session);
 
     if (!product) {
       throw new AppError(httpStatus.NOT_FOUND, 'Product not found.');
@@ -33,7 +70,7 @@ const createOrder = async (data: IOrder): Promise<IOrder> => {
     }
 
     const order = await Order.create(
-      [{ email, product: productId, user, quantity, totalPrice }],
+      [{ email, product: productId, user, quantity, totalPrice, status }],
       { session },
     );
 
@@ -123,5 +160,10 @@ const calculateRevenue = async (): Promise<number> => {
   return result[0]?.totalRevenue || 0;
 };
 
-export const orderService = { createOrder, updateOrder, calculateRevenue };
+export const orderService = {
+  getAllOrders,
+  createOrder,
+  updateOrder,
+  calculateRevenue,
+};
 export default orderService;

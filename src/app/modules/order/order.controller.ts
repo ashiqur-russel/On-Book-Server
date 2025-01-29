@@ -56,4 +56,20 @@ const getTotalRevenue = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-export const orderControllers = { createOrder, updateOrder, getTotalRevenue };
+const getAllOrders = catchAsync(async (req: Request, res: Response) => {
+  const orders = await orderService.getAllOrders(req.query);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Orders retrieved successfully',
+    data: orders,
+  });
+});
+
+export const orderControllers = {
+  createOrder,
+  updateOrder,
+  getTotalRevenue,
+  getAllOrders,
+};

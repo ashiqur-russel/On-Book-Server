@@ -21,6 +21,11 @@ const OrderSchema: Schema<IOrder> = new Schema(
       required: [true, 'Total price is required.'],
       min: [0, 'Total price must be a non-negative number.'],
     },
+    status: {
+      type: String,
+      enum: ['pending', 'completed'],
+      default: 'pending',
+    },
     quantity: {
       type: Number,
       required: [true, 'Quantity is required.'],
