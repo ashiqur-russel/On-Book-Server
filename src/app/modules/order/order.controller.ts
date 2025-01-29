@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import orderService from './order.service';
 import sendResponse from '../../utils/sendResponse';
 import httpStatus from 'http-status';
 import catchAsync from '../../utils/catchAsync';
+import { orderService } from './order.service';
 
 // Create a new order
 const createOrder = catchAsync(async (req: Request, res: Response) => {
@@ -19,6 +19,18 @@ const createOrder = catchAsync(async (req: Request, res: Response) => {
     success: true,
     message: 'Order created successfully',
     data: order,
+  });
+});
+
+const updateOrder = catchAsync(async (req: Request, res: Response) => {
+  const { orderId } = req.params;
+  const updatedOrder = await orderService.updateOrder(orderId, req.body);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Order updated successfully',
+    data: updatedOrder,
   });
 });
 
@@ -44,4 +56,4 @@ const getTotalRevenue = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-export const orderControllers = { createOrder, getTotalRevenue };
+export const orderControllers = { createOrder, updateOrder, getTotalRevenue };

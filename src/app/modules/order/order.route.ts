@@ -13,6 +13,12 @@ router.post(
   validateRequest(OrderValidation.createOrderValidationSchema),
   orderControllers.createOrder,
 );
+router.patch(
+  '/:orderId',
+  AuthGuard(USER_ROLE.user),
+  validateRequest(OrderValidation.updateOrderValidationSchema),
+  orderControllers.updateOrder,
+);
 router.get(
   '/revenue',
   AuthGuard(USER_ROLE.admin),
