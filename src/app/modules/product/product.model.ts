@@ -6,7 +6,7 @@ export const ProductSchema: Schema<IProduct> = new Schema(
     title: { type: String, trim: true, required: [true, 'Title is required'] },
 
     author: {
-      type: Schema.Types.ObjectId,
+      type: String,
       ref: 'Author',
       trim: true,
       required: [true, 'Author is required'],
@@ -45,10 +45,24 @@ export const ProductSchema: Schema<IProduct> = new Schema(
       required: true,
       default: true,
     },
+    soldCount: {
+      type: Number,
+      default: 0,
+    },
+    isBestSold: {
+      type: Boolean,
+      default: false,
+    },
+    hasOffer: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
     versionKey: false,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   },
 );
 

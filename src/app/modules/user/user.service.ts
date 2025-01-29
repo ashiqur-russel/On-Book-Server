@@ -3,7 +3,7 @@ import { IUser } from './user.interface';
 import { User } from './user.model';
 import httpStatus from 'http-status';
 
-export const createUser = async (userData: IUser) => {
+const createUser = async (userData: IUser) => {
   const userExists = await User.isUserExist(userData?.email);
 
   if (userExists && userExists.email === userData.email) {
@@ -14,6 +14,11 @@ export const createUser = async (userData: IUser) => {
   return user;
 };
 
+const getAllUsers = async () => {
+  return await User.find({});
+};
+
 export const UserServices = {
   createUser,
+  getAllUsers,
 };

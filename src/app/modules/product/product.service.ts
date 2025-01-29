@@ -19,7 +19,7 @@ const getAllProducts = async (
   }
 
   const productQuery = new QueryBuilder(Product.find(), query)
-    .search(ProductSearchableFields.filter((field) => field !== 'author')) // Exclude 'author' from $regex
+    .search(ProductSearchableFields)
     .filter()
     .sort()
     .paginate()

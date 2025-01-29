@@ -12,11 +12,23 @@ const registerUser = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Student is created succesfully',
+    message: 'User is created succesfully',
+    data: result,
+  });
+});
+
+const getUsers = catchAsync(async (req, res) => {
+  const result = await UserServices.getAllUsers();
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Users data retireved succesfully',
     data: result,
   });
 });
 
 export const UserControllers = {
   registerUser,
+  getUsers,
 };

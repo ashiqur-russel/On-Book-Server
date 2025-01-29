@@ -1,59 +1,47 @@
 import { Request, Response } from 'express';
 import orderService from './order.service';
+import sendResponse from '../../utils/sendResponse';
+import httpStatus from 'http-status';
+import catchAsync from '../../utils/catchAsync';
 
-export class OrderController {
-  // Create a new order
-  async createOrder(req: Request, res: Response) {
-    try {
-      const order = await orderService.createOrder(req.body);
+// Create a new order
+const createOrder = catchAsync(async (req: Request, res: Response) => {
+  const order = await orderService.createOrder(req.body);
 
-      res.status(201).json({
-        message: 'Order created successfully',
-        status: true,
-        data: order,
-      });
-    } catch (error) {
-      const err = error as Error;
+  res.status(201).json({
+    message: 'Order created successfully',
+    status: true,
+    data: order,
+  });
 
-      if (err.name === 'ValidationError') {
-        res.status(400).json({
-          message: 'Validation Failed',
-          status: false,
-          err,
-          stack: err.stack,
-        });
-      } else {
-        res.status(404).json({
-          message: err.message,
-          status: false,
-          err,
-          stack: err.stack,
-        });
-      }
-    }
-  }
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Order created successfully',
+    data: order,
+  });
+});
 
-  // Get total revenue from orders
-  async getTotalRevenue(req: Request, res: Response) {
-    try {
-      const totalRevenue = await orderService.calculateRevenue();
+// Get total revenue from orders
+const getTotalRevenue = catchAsync(async (req: Request, res: Response) => {
+  const totalRevenue = await orderService.calculateRevenue();
 
-      res.status(201).json({
-        message: 'Revenue calculated successfully',
-        status: true,
-        data: {
-          totalRevenue,
-        },
-      });
-    } catch (error) {
-      res.status(400).json({
-        message: 'Failed to calculate revenue',
-        status: false,
-        error,
-      });
-    }
-  }
-}
+  res.status(201).json({
+    message: 'Revenue calculated successfully',
+    status: true,
+    data: {
+      totalRevenue,
+    },
+  });
 
-const orderController = new OrderController();
-export default orderController;
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Order created successfully',
+    data: {
+      totalRevenue,
+    },
+  });
+});
+
+export const orderControllers = { createOrder, getTotalRevenue };

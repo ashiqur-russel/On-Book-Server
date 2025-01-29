@@ -19,6 +19,11 @@ const userSchema = new Schema<IUser, UserModel>(
       required: true,
       select: 0,
     },
+    status: {
+      type: String,
+      enum: ['pending', 'active', 'blocked'],
+      default: 'pending',
+    },
     role: {
       type: String,
       enum: ['user', 'admin'],

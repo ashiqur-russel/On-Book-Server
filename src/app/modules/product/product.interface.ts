@@ -1,5 +1,3 @@
-import { Types } from 'mongoose';
-
 export type TCategory =
   | 'Fiction'
   | 'Science'
@@ -9,10 +7,13 @@ export type TCategory =
 
 export interface IProduct {
   title: string;
-  author: Types.ObjectId;
+  author: string;
   price: number;
   category: TCategory;
   description: string;
   quantity: number;
   inStock: boolean;
+  soldCount?: number;
+  isBestSold?: boolean;
+  hasOffer?: boolean;
 }

@@ -6,6 +6,7 @@ export interface IUser {
   name: string;
   email: string;
   password: string;
+  status?: 'pending | blocked | approved';
   role: 'admin' | 'user';
 }
 
