@@ -7,7 +7,7 @@ import { USER_ROLE } from '../user/user.constant';
 
 const router = Router();
 
-router.get('/', AuthGuard(USER_ROLE.admin), productController.getAllProducts);
+router.get('/', productController.getAllProducts);
 router.post(
   '/',
   AuthGuard(USER_ROLE.admin),

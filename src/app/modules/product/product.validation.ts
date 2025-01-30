@@ -24,6 +24,7 @@ const createProductValidationSchema = z.object({
     soldCount: z.number().optional(),
     isBestSold: z.boolean().optional(),
     hasOffer: z.boolean().optional(),
+    productImg: z.string().optional(),
   }),
 });
 
@@ -39,6 +40,7 @@ const updateProductValidationSchema = z.object({
     quantity: z.number().int().min(0).optional(),
     inStock: z.boolean().optional(),
     hasOffer: z.boolean().optional(),
+    productImg: z.string().optional(),
   }),
 });
 

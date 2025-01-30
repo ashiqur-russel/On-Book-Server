@@ -16,4 +16,5 @@ export interface IProduct {
   soldCount?: number;
   isBestSold?: boolean;
   hasOffer?: boolean;
+  productImg?: string;
 }

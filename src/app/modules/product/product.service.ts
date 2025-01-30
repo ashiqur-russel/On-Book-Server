@@ -6,9 +6,7 @@ import QueryBuilder from '../../builder/QueryBuilder';
 import { ProductSearchableFields } from './prodcut.constant';
 import { User } from '../user/user.model';
 
-const getAllProducts = async (
-  query: Record<string, unknown>,
-): Promise<IProduct[]> => {
+const getAllProducts = async (query: Record<string, unknown>) => {
   if (query.author && typeof query.author === 'string') {
     const user = await User.findOne({ name: query.author });
     if (user) {
@@ -25,9 +23,14 @@ const getAllProducts = async (
     .paginate()
     .fields();
 
+  const meta = await productQuery.countTotal();
+
   const result = await productQuery.modelQuery;
 
-  return result;
+  return {
+    meta,
+    result,
+  };
 };
 
 const getProductById = async (productId: string): Promise<IProduct | null> => {
