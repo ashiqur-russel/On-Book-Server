@@ -1,5 +1,5 @@
 import { Product } from './product.model';
-import { IProduct, UploadFile } from './product.interface';
+import { IProduct } from './product.interface';
 import { NotFoundError } from '../../utils/errors';
 import mongoose from 'mongoose';
 import QueryBuilder from '../../builder/QueryBuilder';
@@ -49,7 +49,8 @@ const getProductById = async (productId: string): Promise<IProduct | null> => {
 };
 
 const createProduct = async (
-  file: UploadFile,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  file: any,
   payload: IProduct,
 ): Promise<IProduct> => {
   const session = await mongoose.startSession();
@@ -64,7 +65,6 @@ const createProduct = async (
 
       // Upload image to Cloudinary
       const uploadResponse = await sendImageToCloudinary(imageName, path);
-      console.log('Cloudinary Response:', uploadResponse);
 
       if (!uploadResponse || !uploadResponse.secure_url) {
         throw new Error('Image upload failed.');

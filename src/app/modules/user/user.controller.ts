@@ -28,7 +28,20 @@ const getUsers = catchAsync(async (req, res) => {
   });
 });
 
+const getMe = catchAsync(async (req, res) => {
+  const { email } = req.user;
+  const result = await UserServices.getMe(email);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Data retireved succesfully',
+    data: result,
+  });
+});
+
 export const UserControllers = {
   registerUser,
   getUsers,
+  getMe,
 };

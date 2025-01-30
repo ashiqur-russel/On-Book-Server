@@ -23,7 +23,6 @@ router.post(
 router.get('/:productId', productController.getProductById);
 router.put(
   '/:productId',
-  AuthGuard(USER_ROLE.admin),
   validateRequest(ProductValidation.updateProductValidationSchema),
 
   productController.updateProduct,
