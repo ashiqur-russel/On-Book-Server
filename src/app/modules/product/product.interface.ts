@@ -18,3 +18,10 @@ export interface IProduct {
   hasOffer?: boolean;
   productImg?: string;
 }
+
+export interface UploadFile {
+  path: string;
+  originalname: string;
+  mimetype: string;
+  filename?: string;
+}

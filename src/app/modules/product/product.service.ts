@@ -1,10 +1,11 @@
 import { Product } from './product.model';
-import { IProduct } from './product.interface';
+import { IProduct, UploadFile } from './product.interface';
 import { NotFoundError } from '../../utils/errors';
 import mongoose from 'mongoose';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { ProductSearchableFields } from './prodcut.constant';
 import { User } from '../user/user.model';
+import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
 
 const getAllProducts = async (query: Record<string, unknown>) => {
   if (query.author && typeof query.author === 'string') {
@@ -47,8 +48,45 @@ const getProductById = async (productId: string): Promise<IProduct | null> => {
   return product;
 };
 
-const createProduct = async (product: IProduct): Promise<IProduct> => {
-  return await Product.create(product);
+const createProduct = async (
+  file: UploadFile,
+  payload: IProduct,
+): Promise<IProduct> => {
+  const session = await mongoose.startSession();
+
+  try {
+    session.startTransaction();
+
+    // Upload Image If File Exists
+    if (file) {
+      const imageName = `${payload.title}_${payload.category}`;
+      const path = file.path;
+
+      // Upload image to Cloudinary
+      const uploadResponse = await sendImageToCloudinary(imageName, path);
+      console.log('Cloudinary Response:', uploadResponse);
+
+      if (!uploadResponse || !uploadResponse.secure_url) {
+        throw new Error('Image upload failed.');
+      }
+
+      // Update payload with secure URL
+      payload.productImg = uploadResponse.secure_url;
+    }
+
+    // Creating Product with updated payload
+    const product = new Product(payload);
+    const savedProduct = await product.save({ session });
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return savedProduct;
+  } catch (err) {
+    await session.abortTransaction();
+    session.endSession();
+    throw err;
+  }
 };
 
 const updateProduct = async (

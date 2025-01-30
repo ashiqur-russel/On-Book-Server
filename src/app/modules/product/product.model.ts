@@ -9,6 +9,7 @@ export const ProductSchema: Schema<IProduct> = new Schema(
       type: String,
       required: [true, 'Author is required'],
     },
+    productImg: { type: String, required: false },
     price: {
       type: Number,
       required: [true, 'Price is required'],
@@ -47,7 +48,6 @@ export const ProductSchema: Schema<IProduct> = new Schema(
       type: Number,
       default: 0,
     },
-    productImg: { type: String },
 
     isBestSold: {
       type: Boolean,

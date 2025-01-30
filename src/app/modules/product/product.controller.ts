@@ -32,7 +32,9 @@ const getProductById = catchAsync(async (req: Request, res: Response) => {
 
 // Create product
 const createProduct = catchAsync(async (req: Request, res: Response) => {
-  const product = await productService.createProduct(req.body);
+  const { product: productData } = req.body;
+
+  const product = await productService.createProduct(req.file, productData);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
