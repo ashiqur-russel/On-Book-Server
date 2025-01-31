@@ -32,4 +32,10 @@ router.get(
   orderControllers.getTotalRevenue,
 );
 
+router.get(
+  '/my-orders',
+  AuthGuard(USER_ROLE.user),
+  orderControllers.getMyOrders,
+);
+
 export const OrderRouters = router;

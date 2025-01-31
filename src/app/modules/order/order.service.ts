@@ -5,6 +5,7 @@ import { Product } from '../product/product.model';
 import AppError from '../../errors/handleAppError';
 import httpStatus from 'http-status';
 import QueryBuilder from '../../builder/QueryBuilder';
+import { User } from '../user/user.model';
 
 const getAllOrders = async (query: Record<string, unknown>) => {
   const orderQuery = new QueryBuilder(Order.find(), query)
@@ -146,6 +147,19 @@ const updateOrder = async (
   }
 };
 
+const getMyOrder = async (email: string) => {
+  const user = await User.find({ email });
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User Not Found');
+  }
+  const userId = user[0]._id;
+  const orders = await Order.find({ user: userId });
+  if (!orders) {
+    throw new AppError(httpStatus.NOT_FOUND, 'No Orders Found');
+  }
+  return orders;
+};
+
 // Calculate total revenue using aggregation
 const calculateRevenue = async (): Promise<number> => {
   const result = await Order.aggregate([
@@ -165,5 +179,6 @@ export const orderService = {
   createOrder,
   updateOrder,
   calculateRevenue,
+  getMyOrder,
 };
 export default orderService;
