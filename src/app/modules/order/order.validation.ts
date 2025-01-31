@@ -12,6 +12,12 @@ const createOrderValidationSchema = z.object({
     product: z.string().refine((val) => /^[0-9a-fA-F]{24}$/.test(val), {
       message: 'Product must be a valid ObjectId.',
     }),
+    payment: z
+      .string()
+      .refine((val) => /^[0-9a-fA-F]{24}$/.test(val), {
+        message: 'Product must be a valid ObjectId.',
+      })
+      .optional(),
     quantity: z
       .number()
       .int()
@@ -19,7 +25,10 @@ const createOrderValidationSchema = z.object({
     totalPrice: z
       .number()
       .min(0, { message: 'Total price must be a non-negative number.' }),
-    status: z.enum(['pending', 'completed']).optional().default('pending'),
+    deliveryStatus: z
+      .enum(['pending', 'shipped', 'delivered'])
+      .optional()
+      .default('pending'),
   }),
 });
 
@@ -38,6 +47,7 @@ const updateOrderValidationSchema = z.object({
         message: 'Product must be a valid ObjectId.',
       })
       .optional(),
+
     quantity: z
       .number()
       .int()
@@ -47,7 +57,10 @@ const updateOrderValidationSchema = z.object({
       .number()
       .min(0, { message: 'Total price must be a non-negative number.' })
       .optional(),
-    status: z.enum(['pending', 'completed']).optional(),
+    deliveryStatus: z
+      .enum(['pending', 'shipped', 'delivered'])
+      .optional()
+      .default('pending'),
   }),
 });
 

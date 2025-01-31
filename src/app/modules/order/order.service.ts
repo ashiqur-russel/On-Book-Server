@@ -48,7 +48,7 @@ const createOrder = async (data: IOrder): Promise<IOrder> => {
       product: productId,
       totalPrice,
       user,
-      status,
+      deliveryStatus,
     } = data;
 
     if (!mongoose.Types.ObjectId.isValid(user.toString())) {
@@ -71,7 +71,16 @@ const createOrder = async (data: IOrder): Promise<IOrder> => {
     }
 
     const order = await Order.create(
-      [{ email, product: productId, user, quantity, totalPrice, status }],
+      [
+        {
+          email,
+          product: productId,
+          user,
+          quantity,
+          totalPrice,
+          deliveryStatus,
+        },
+      ],
       { session },
     );
 
@@ -148,15 +157,26 @@ const updateOrder = async (
 };
 
 const getMyOrder = async (email: string) => {
-  const user = await User.find({ email });
+  const user = await User.findOne({ email });
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User Not Found');
   }
-  const userId = user[0]._id;
-  const orders = await Order.find({ user: userId });
-  if (!orders) {
+
+  const orders = await Order.find({ user: user._id })
+    .populate({
+      path: 'user',
+      select: 'name email',
+    })
+    .populate({
+      path: 'product',
+      select: 'title price productImg',
+    })
+    .exec();
+
+  if (!orders || orders.length === 0) {
     throw new AppError(httpStatus.NOT_FOUND, 'No Orders Found');
   }
+
   return orders;
 };
 

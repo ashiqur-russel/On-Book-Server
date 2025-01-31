@@ -4,7 +4,8 @@ export interface IOrder {
   email: string;
   product: Types.ObjectId;
   user: Types.ObjectId;
-  status: 'pending' | 'completed';
+  payment?: Types.ObjectId | null;
+  deliveryStatus?: 'pending' | 'shipped' | 'delivered';
   quantity: number;
   totalPrice: number;
   createdAt?: Date;

@@ -19,10 +19,7 @@ const getAllUsers = async () => {
 };
 
 const getMe = async (email: string) => {
-  console.log(email);
-
   const user = await User.find({ email });
-  console.log(user);
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found!');
   }

@@ -10,10 +10,17 @@ const OrderSchema: Schema<IOrder> = new Schema(
     },
     user: {
       type: Schema.Types.ObjectId,
+      ref: 'User',
       required: [true, 'User ID is required.'],
+    },
+    payment: {
+      type: Schema.Types.ObjectId,
+      ref: 'Payment',
+      default: null,
     },
     product: {
       type: Schema.Types.ObjectId,
+      ref: 'Product',
       required: [true, 'Product ID is required.'],
     },
     totalPrice: {
@@ -21,9 +28,9 @@ const OrderSchema: Schema<IOrder> = new Schema(
       required: [true, 'Total price is required.'],
       min: [0, 'Total price must be a non-negative number.'],
     },
-    status: {
+    deliveryStatus: {
       type: String,
-      enum: ['pending', 'completed'],
+      enum: ['pending', 'shipped', 'delivered'],
       default: 'pending',
     },
     quantity: {
@@ -35,9 +42,11 @@ const OrderSchema: Schema<IOrder> = new Schema(
   {
     timestamps: true,
     versionKey: false,
-    toJSON: { virtuals: false },
+    toJSON: { virtuals: true },
     toObject: { virtuals: true },
   },
 );
+
+OrderSchema.index({ user: 1, createdAt: -1 });
 
 export const Order = mongoose.model<IOrder>('Order', OrderSchema);
