@@ -30,7 +30,7 @@ const OrderSchema: Schema<IOrder> = new Schema(
     },
     deliveryStatus: {
       type: String,
-      enum: ['pending', 'shipped', 'delivered'],
+      enum: ['pending', 'shipped', 'delivered', 'cancelled', 'revoked'],
       default: 'pending',
     },
     quantity: {

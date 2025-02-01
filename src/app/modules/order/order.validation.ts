@@ -26,7 +26,7 @@ const createOrderValidationSchema = z.object({
       .number()
       .min(0, { message: 'Total price must be a non-negative number.' }),
     deliveryStatus: z
-      .enum(['pending', 'shipped', 'delivered'])
+      .enum(['pending', 'shipped', 'delivered', 'cancelled', 'revoked'])
       .optional()
       .default('pending'),
   }),
@@ -58,7 +58,7 @@ const updateOrderValidationSchema = z.object({
       .min(0, { message: 'Total price must be a non-negative number.' })
       .optional(),
     deliveryStatus: z
-      .enum(['pending', 'shipped', 'delivered'])
+      .enum(['pending', 'shipped', 'delivered', 'cancelled', 'revoked'])
       .optional()
       .default('pending'),
   }),

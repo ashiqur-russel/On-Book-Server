@@ -41,8 +41,21 @@ const getMe = async (email: string) => {
   return user;
 };
 
+const updateUserProfileStatus = async (userId: string, status: string) => {
+  const result = await User.findByIdAndUpdate(
+    userId,
+    { status },
+    { new: true, runValidators: true },
+  );
+  if (!result) {
+    throw new Error('User not found');
+  }
+  return result;
+};
+
 export const UserServices = {
   createUser,
   getAllUsers,
   getMe,
+  updateUserProfileStatus,
 };
