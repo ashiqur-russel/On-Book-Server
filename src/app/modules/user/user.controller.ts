@@ -18,13 +18,14 @@ const registerUser = catchAsync(async (req, res) => {
 });
 
 const getUsers = catchAsync(async (req, res) => {
-  const result = await UserServices.getAllUsers();
+  const { users, meta } = await UserServices.getAllUsers(req.query);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Users data retireved succesfully',
-    data: result,
+    data: users,
+    meta: meta,
   });
 });
 

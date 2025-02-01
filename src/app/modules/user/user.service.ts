@@ -1,3 +1,4 @@
+import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../errors/handleAppError';
 import { IUser } from './user.interface';
 import { User } from './user.model';
@@ -14,8 +15,22 @@ const createUser = async (userData: IUser) => {
   return user;
 };
 
-const getAllUsers = async () => {
-  return await User.find({});
+const getAllUsers = async (query: Record<string, unknown>) => {
+  const usersQuery = new QueryBuilder(User.find(), query)
+    .search(['name', 'email', 'role'])
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const meta = await usersQuery.countTotal();
+
+  const users = await usersQuery.modelQuery;
+
+  return {
+    meta,
+    users,
+  };
 };
 
 const getMe = async (email: string) => {

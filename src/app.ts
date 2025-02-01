@@ -8,15 +8,20 @@ const app = express();
 
 // Middlewares
 app.use(express.json());
+
+// app.use(
+//   cors({
+//     origin: 'https://book-on-client.vercel.app',
+//     credentials: true,
+//   }),
+// );
 app.use(
   cors({
-    origin: [
-      'http://localhost:5173',
-      'ttps://book-on-client-8px8a0y3m-ashiqurrussels-projects.vercel.app',
-    ],
+    origin: 'http://localhost:5173',
     credentials: true,
   }),
 );
+
 app.use(cookieParser());
 
 //Routes
