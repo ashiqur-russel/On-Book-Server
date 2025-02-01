@@ -48,9 +48,16 @@ const updateUserProfileStatus = async (userId: string, status: string) => {
     { new: true, runValidators: true },
   );
   if (!result) {
-    throw new Error('User not found');
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
   }
   return result;
+};
+
+const deleteUser = async (userId: string) => {
+  const result = await User.findByIdAndDelete(userId);
+  if (!result) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+  }
 };
 
 export const UserServices = {
@@ -58,4 +65,5 @@ export const UserServices = {
   getAllUsers,
   getMe,
   updateUserProfileStatus,
+  deleteUser,
 };

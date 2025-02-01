@@ -14,14 +14,22 @@ router.post(
 );
 
 router.get('/', AuthGuard(USER_ROLE.admin), UserControllers.getUsers);
+
 router.get(
   '/me',
   AuthGuard(USER_ROLE.user, USER_ROLE.admin),
   UserControllers.getMe,
 );
+
 router.patch(
   '/:userId/status',
-  // AuthGuard(USER_ROLE.user, USER_ROLE.admin),
+  AuthGuard(USER_ROLE.admin),
   UserControllers.updateUserStatus,
+);
+
+router.delete(
+  '/:userId',
+  AuthGuard(USER_ROLE.admin),
+  UserControllers.deleteUser,
 );
 export const UserRoutes = router;
