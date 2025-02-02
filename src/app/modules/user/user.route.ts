@@ -32,4 +32,11 @@ router.delete(
   AuthGuard(USER_ROLE.admin),
   UserControllers.deleteUser,
 );
+
+router.patch(
+  '/:userId/change-password',
+  AuthGuard(USER_ROLE.user, USER_ROLE.admin),
+  validateRequest(UserValidation.changePasswordValidationSchemma),
+  UserControllers.deleteUser,
+);
 export const UserRoutes = router;

@@ -21,7 +21,7 @@ const userSchema = new Schema<IUser, UserModel>(
     },
     status: {
       type: String,
-      enum: ['pending', 'active', 'blocked'],
+      enum: ['pending', 'active', 'blocked', 'approved'],
       default: 'pending',
     },
     role: {

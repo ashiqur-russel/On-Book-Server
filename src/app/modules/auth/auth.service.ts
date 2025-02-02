@@ -43,6 +43,12 @@ const changePassword = async (
     throw new AppError(httpStatus.NOT_FOUND, 'This user is not found !');
   }
 
+  const userStatus = user?.status?.toLocaleLowerCase();
+
+  if (userStatus === 'blocked') {
+    throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked !');
+  }
+
   if (!(await User.isPasswordMatched(payload.oldPassword, user?.password)))
     throw new AppError(httpStatus.FORBIDDEN, 'Password do not matched');
 
@@ -52,20 +58,12 @@ const changePassword = async (
   );
 
   await User.findOneAndUpdate(
-    {
-      id: userData.userId,
-      role: userData.role,
-    },
+    { email: userData.email, role: userData.role },
     {
       password: newHashedPassword,
-      needsPasswordChange: false,
-      passwordChangedAt: new Date(),
     },
   );
-
-  return null;
 };
-
 export const AuthServices = {
   loginUser,
   changePassword,

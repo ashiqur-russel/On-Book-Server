@@ -60,10 +60,15 @@ const deleteUser = async (userId: string) => {
   }
 };
 
+const changePassword = async (oldPassword: string, newPassword: string) => {
+  console.log(oldPassword, newPassword);
+};
+
 export const UserServices = {
   createUser,
   getAllUsers,
   getMe,
   updateUserProfileStatus,
   deleteUser,
+  changePassword,
 };

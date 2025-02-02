@@ -14,7 +14,7 @@ router.get(
 
 router.post(
   '/',
-  AuthGuard(USER_ROLE.user, USER_ROLE.admin),
+  AuthGuard(USER_ROLE.user),
   validateRequest(OrderValidation.createOrderValidationSchema),
   orderControllers.createOrder,
 );

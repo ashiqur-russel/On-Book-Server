@@ -28,9 +28,14 @@ const OrderSchema: Schema<IOrder> = new Schema(
       required: [true, 'Total price is required.'],
       min: [0, 'Total price must be a non-negative number.'],
     },
+    status: {
+      type: String,
+      enum: ['completed', 'cancelled'],
+      default: 'completed',
+    },
     deliveryStatus: {
       type: String,
-      enum: ['pending', 'shipped', 'delivered', 'cancelled', 'revoked'],
+      enum: ['pending', 'shipped', 'delivered', 'revoked'],
       default: 'pending',
     },
     quantity: {
@@ -42,8 +47,6 @@ const OrderSchema: Schema<IOrder> = new Schema(
   {
     timestamps: true,
     versionKey: false,
-    toJSON: { virtuals: true },
-    toObject: { virtuals: true },
   },
 );
 

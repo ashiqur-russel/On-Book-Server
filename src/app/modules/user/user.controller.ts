@@ -66,10 +66,23 @@ const deleteUser = catchAsync(async (req, res) => {
   });
 });
 
+const changePassword = catchAsync(async (req, res) => {
+  const { userId } = req.params;
+  await UserServices.deleteUser(userId);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Password changed succesfully',
+    data: {},
+  });
+});
+
 export const UserControllers = {
   registerUser,
   getUsers,
   getMe,
   updateUserStatus,
   deleteUser,
+  changePassword,
 };

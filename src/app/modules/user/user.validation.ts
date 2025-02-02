@@ -11,6 +11,21 @@ const userValidationSchema = z.object({
   }),
 });
 
+const changePasswordValidationSchemma = z.object({
+  body: z.object({
+    oldPassword: z.string().min(5),
+    newPassword: z.string().min(5),
+  }),
+});
+
+const updateUserStatusValidationSchema = z.object({
+  body: z.object({
+    status: z.enum(['pending', 'active', 'blocked', 'approved']),
+  }),
+});
+
 export const UserValidation = {
   userValidationSchema,
+  changePasswordValidationSchemma,
+  updateUserStatusValidationSchema,
 };

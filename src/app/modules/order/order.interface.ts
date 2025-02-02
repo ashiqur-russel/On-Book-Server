@@ -5,12 +5,8 @@ export interface IOrder {
   product: Types.ObjectId;
   user: Types.ObjectId;
   payment?: Types.ObjectId | null;
-  deliveryStatus?:
-    | 'pending'
-    | 'shipped'
-    | 'delivered'
-    | 'cancelled'
-    | 'revoked';
+  status: 'completed' | 'cancelled';
+  deliveryStatus?: 'pending' | 'shipped' | 'delivered' | 'revoked';
   quantity: number;
   totalPrice: number;
   createdAt?: Date;
