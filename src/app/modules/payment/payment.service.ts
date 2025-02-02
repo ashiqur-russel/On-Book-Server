@@ -83,6 +83,10 @@ export const handleStripeWebhook = async (event: Stripe.Event) => {
       );
 
       if (sessionDetails.payment_status !== 'paid') {
+        throw new AppError(
+          httpStatus.PRECONDITION_FAILED,
+          'Payment not completed. Skipping order creation.',
+        );
         return;
       }
 
@@ -122,6 +126,10 @@ export const handleStripeWebhook = async (event: Stripe.Event) => {
           await payment.save({ session: sessionTransaction });
         }
 
+        // Update the Order with Payment ID
+        order.payment = payment._id;
+        await order.save({ session: sessionTransaction });
+
         await sessionTransaction.commitTransaction();
         sessionTransaction.endSession();
       } catch (error) {
@@ -133,7 +141,7 @@ export const handleStripeWebhook = async (event: Stripe.Event) => {
       console.error(' Stripe Session Retrieval Error:', error);
     }
   } else {
-    console.log(`⚠️Unhandled event type: ${event.type}`);
+    console.log(` Unhandled event type: ${event.type}`);
   }
 };
 
@@ -157,7 +165,6 @@ export const issueRefund = async (paymentId: string) => {
       throw new AppError(httpStatus.CONFLICT, 'Payment already refunded');
     }
 
-    //  Find Order
     const order = await Order.findOne({ payment: payment._id }).session(
       sessionTransaction,
     );
