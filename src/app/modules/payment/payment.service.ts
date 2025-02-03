@@ -6,6 +6,7 @@ import { Order } from '../order/order.model';
 import { User } from '../user/user.model';
 import AppError from '../../errors/handleAppError';
 import httpStatus from 'http-status';
+import { Product } from '../product/product.model';
 
 const stripe = new Stripe(config.stripe_secret_key as string, {});
 
@@ -125,6 +126,30 @@ export const handleStripeWebhook = async (event: Stripe.Event) => {
           payment.order = order._id;
           await payment.save({ session: sessionTransaction });
         }
+
+        const product =
+          await Product.findById(productId).session(sessionTransaction);
+        if (!product) {
+          throw new AppError(httpStatus.NOT_FOUND, 'Product not found');
+        }
+
+        product.quantity -= quantity;
+        if (product.soldCount !== undefined) {
+          product.soldCount += quantity;
+        } else {
+          product.soldCount = quantity;
+        }
+
+        if (product.quantity <= 0) {
+          product.quantity = 0;
+          product.inStock = false;
+        }
+
+        if (product.soldCount >= 10) {
+          product.isBestSold = true;
+        }
+
+        await product.save({ session: sessionTransaction });
 
         // Update the Order with Payment ID
         order.payment = payment._id;
