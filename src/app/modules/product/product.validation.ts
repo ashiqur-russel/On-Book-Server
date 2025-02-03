@@ -7,7 +7,14 @@ const createProductValidationSchema = z.object({
       author: z.string(),
       price: z.number().min(0, { message: 'Price must be a positive number' }),
       category: z.enum(
-        ['Fiction', 'Science', 'SelfDevelopment', 'Poetry', 'Religious'],
+        [
+          'Fiction',
+          'Science',
+          'SelfDevelopment',
+          'Poetry',
+          'Religious',
+          'Thriller',
+        ],
         {
           message:
             'Category must be one of Fiction, Science, SelfDevelopment, Poetry, Religious',

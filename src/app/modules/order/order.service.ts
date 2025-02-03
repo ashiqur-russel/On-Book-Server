@@ -174,7 +174,7 @@ const getMyOrder = async (email: string) => {
     .exec();
 
   if (!orders || orders.length === 0) {
-    throw new AppError(httpStatus.NOT_FOUND, 'No Orders Found');
+    return [];
   }
 
   return orders;

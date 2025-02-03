@@ -25,6 +25,7 @@ export const ProductSchema: Schema<IProduct> = new Schema(
           'SelfDevelopment',
           'Poetry',
           'Religious',
+          'Thriller',
         ],
         message: '{VALUE} is not a valid category',
       },

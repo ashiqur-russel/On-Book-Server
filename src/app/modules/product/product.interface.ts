@@ -3,7 +3,8 @@ export type TCategory =
   | 'Science'
   | 'SelfDevelopment'
   | 'Poetry'
-  | 'Religious';
+  | 'Religious'
+  | 'Thriller';
 
 export interface IProduct {
   title: string;

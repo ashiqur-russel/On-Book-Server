@@ -38,7 +38,6 @@ const changePassword = async (
   payload: { oldPassword: string; newPassword: string },
 ) => {
   const user = await User.isUserExist(userData.email);
-
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'This user is not found !');
   }

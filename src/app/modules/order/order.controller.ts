@@ -74,8 +74,9 @@ const getMyOrders = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Orders retrieved successfully',
-    data: orders,
+    message:
+      orders.length > 0 ? 'Orders retrieved successfully' : 'No orders found',
+    data: orders || [],
   });
 });
 
