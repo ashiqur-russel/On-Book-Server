@@ -30,11 +30,13 @@ const getAllOrders = async (query: Record<string, unknown>) => {
       .lte(maxPrice);
   }
 
+  const meta = await orderQuery.countTotal();
+
   const orders = await orderQuery.modelQuery
     .populate('product', 'title price')
     .populate('user', 'name email');
 
-  return orders;
+  return { orders, meta };
 };
 
 const createOrder = async (data: IOrder): Promise<IOrder> => {

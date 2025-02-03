@@ -57,15 +57,17 @@ const getTotalRevenue = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllOrders = catchAsync(async (req: Request, res: Response) => {
-  const orders = await orderService.getAllOrders(req.query);
+  const result = await orderService.getAllOrders(req.query);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Orders retrieved successfully',
-    data: orders,
+    data: result.orders,
+    meta: result.meta,
   });
 });
+
 
 const getMyOrders = catchAsync(async (req: Request, res: Response) => {
   const { email } = req.user;
