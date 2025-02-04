@@ -28,7 +28,9 @@ const createProductValidationSchema = z.object({
         .number()
         .int()
         .min(0, { message: 'Quantity must be a non-negative integer' }),
-      inStock: z.boolean().optional().default(true),
+      inStock: z.boolean().optional(),
+      discountAmount: z.number().min(0).optional(),
+      isFeatured: z.boolean().optional(),
       soldCount: z.number().optional(),
       isBestSold: z.boolean().optional(),
       hasOffer: z.boolean().optional(),
@@ -42,6 +44,8 @@ const updateProductValidationSchema = z.object({
     title: z.string().trim().min(1).optional(),
     author: z.string().optional(),
     price: z.number().min(0).optional(),
+    discountAmount: z.number().min(0).optional(),
+
     category: z
       .enum(['Fiction', 'Science', 'SelfDevelopment', 'Poetry', 'Religious'])
       .optional(),
@@ -50,6 +54,7 @@ const updateProductValidationSchema = z.object({
     inStock: z.boolean().optional(),
     hasOffer: z.boolean().optional(),
     productImg: z.string().optional(),
+    isFeatured: z.boolean().optional(),
   }),
 });
 

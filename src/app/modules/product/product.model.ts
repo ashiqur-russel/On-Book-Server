@@ -15,6 +15,11 @@ export const ProductSchema: Schema<IProduct> = new Schema(
       required: [true, 'Price is required'],
       min: [0, 'Price must be a positive number'],
     },
+    discountAmount: {
+      type: Number,
+      required: false,
+      min: [0, 'Discount must be a positive number'],
+    },
     category: {
       type: String,
       required: [true, 'Category is required'],
@@ -44,6 +49,11 @@ export const ProductSchema: Schema<IProduct> = new Schema(
       type: Boolean,
       required: true,
       default: true,
+    },
+    isFeatured: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
     soldCount: {
       type: Number,

@@ -5,7 +5,11 @@ import { USER_ROLE } from '../user/user.constant';
 
 const router = express.Router();
 
-router.post('/:id/issue-refund', PaymentControllers.issueRefund);
+router.post(
+  '/:id/issue-refund',
+  AuthGuard(USER_ROLE.admin),
+  PaymentControllers.issueRefund,
+);
 
 router.post(
   '/create-checkout-session',

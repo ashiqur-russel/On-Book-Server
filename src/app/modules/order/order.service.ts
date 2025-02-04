@@ -183,6 +183,10 @@ const getMyOrder = async (email: string, query: Record<string, unknown>) => {
       path: 'product',
       select: 'title price productImg',
     })
+    .populate({
+      path: 'payment',
+      select: 'status',
+    })
     .exec();
 
   return { orders, meta };

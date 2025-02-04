@@ -17,7 +17,9 @@ export interface IProduct {
   soldCount?: number;
   isBestSold?: boolean;
   hasOffer?: boolean;
+  isFeatured?: boolean;
   productImg?: string;
+  discountAmount?: number;
 }
 
 export interface UploadFile {
