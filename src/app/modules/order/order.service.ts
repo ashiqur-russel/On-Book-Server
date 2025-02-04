@@ -34,7 +34,8 @@ const getAllOrders = async (query: Record<string, unknown>) => {
 
   const orders = await orderQuery.modelQuery
     .populate('product', 'title price')
-    .populate('user', 'name email');
+    .populate('user', 'name email')
+    .populate('payment', '_id status');
 
   return { orders, meta };
 };
@@ -158,13 +159,22 @@ const updateOrder = async (
   }
 };
 
-const getMyOrder = async (email: string) => {
+const getMyOrder = async (email: string, query: Record<string, unknown>) => {
   const user = await User.findOne({ email });
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User Not Found');
   }
 
-  const orders = await Order.find({ user: user._id })
+  const orderQuery = new QueryBuilder(Order.find({ user: user._id }), query)
+    .search(['email', 'status'])
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const meta = await orderQuery.countTotal();
+
+  const orders = await orderQuery.modelQuery
     .populate({
       path: 'user',
       select: 'name email',
@@ -175,11 +185,7 @@ const getMyOrder = async (email: string) => {
     })
     .exec();
 
-  if (!orders || orders.length === 0) {
-    return [];
-  }
-
-  return orders;
+  return { orders, meta };
 };
 
 // Calculate total revenue using aggregation
@@ -196,11 +202,54 @@ const calculateRevenue = async (): Promise<number> => {
   return result[0]?.totalRevenue || 0;
 };
 
+const cancelOrder = async (orderId: string): Promise<IOrder | null> => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    if (!mongoose.Types.ObjectId.isValid(orderId)) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Invalid order ID.');
+    }
+
+    const order = await Order.findById(orderId).session(session);
+    if (!order) {
+      throw new AppError(httpStatus.NOT_FOUND, 'Order not found.');
+    }
+
+    if (order.deliveryStatus !== 'pending') {
+      throw new AppError(
+        httpStatus.CONFLICT,
+        'Only pending orders can be cancelled.',
+      );
+    }
+
+    const product = await Product.findById(order.product).session(session);
+    if (product) {
+      product.quantity += order.quantity;
+      product.inStock = true;
+      await product.save({ session });
+    }
+
+    order.deliveryStatus = 'revoked';
+    order.status = 'cancelled';
+    const updatedOrder = await order.save({ session });
+
+    await session.commitTransaction();
+    session.endSession();
+    return updatedOrder;
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
+  }
+};
+
 export const orderService = {
   getAllOrders,
   createOrder,
   updateOrder,
   calculateRevenue,
   getMyOrder,
+  cancelOrder,
 };
 export default orderService;

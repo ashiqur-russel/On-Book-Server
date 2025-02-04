@@ -4,19 +4,9 @@ import { NotFoundError } from '../../utils/errors';
 import mongoose from 'mongoose';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { ProductSearchableFields } from './prodcut.constant';
-import { User } from '../user/user.model';
 import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
 
 const getAllProducts = async (query: Record<string, unknown>) => {
-  if (query.author && typeof query.author === 'string') {
-    const user = await User.findOne({ name: query.author });
-    if (user) {
-      query.author = user._id;
-    } else {
-      throw new Error(`User with name "${query.author}" not found.`);
-    }
-  }
-
   const productQuery = new QueryBuilder(Product.find(), query)
     .search(ProductSearchableFields)
     .filter()

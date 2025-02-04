@@ -95,7 +95,6 @@ export const stripeWebhookHandler = catchAsync(
  */
 export const issueRefund = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-
   const refundResponse = await PaymentServices.issueRefund(id);
 
   sendResponse(res, {

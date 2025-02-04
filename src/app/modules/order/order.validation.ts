@@ -64,7 +64,14 @@ const updateOrderValidationSchema = z.object({
   }),
 });
 
+const cancelOrderValidationSchema = z.object({
+  body: z.object({
+    reason: z.string().optional(),
+  }),
+});
+
 export const OrderValidation = {
   createOrderValidationSchema,
   updateOrderValidationSchema,
+  cancelOrderValidationSchema,
 };

@@ -178,14 +178,12 @@ export const issueRefund = async (paymentId: string) => {
   sessionTransaction.startTransaction();
 
   try {
-    // Find Payment Record
     const payment =
       await Payment.findById(paymentId).session(sessionTransaction);
     if (!payment) {
       throw new AppError(httpStatus.NOT_FOUND, 'Payment record not found');
     }
 
-    // Check if Payment is Already Refunded
     if (payment.status === 'refunded') {
       throw new AppError(httpStatus.CONFLICT, 'Payment already refunded');
     }
@@ -197,7 +195,6 @@ export const issueRefund = async (paymentId: string) => {
       throw new AppError(httpStatus.NOT_FOUND, 'Associated order not found');
     }
 
-    // check if Order is Cancelled
     if (order.status !== 'cancelled') {
       throw new AppError(
         httpStatus.BAD_REQUEST,
@@ -205,17 +202,19 @@ export const issueRefund = async (paymentId: string) => {
       );
     }
 
-    // Process Refund via Stripe
     const refund = await stripe.refunds.create({
       payment_intent: payment.stripePaymentId,
     });
 
-    console.log('REFUND====>>>>', refund);
-
     payment.status = 'refunded';
     await payment.save({ session: sessionTransaction });
 
-    if (order.deliveryStatus === 'shipped') {
+    // TODO:: delivery status should be cancelled
+    // TODO:: (change revoked to revoked if pending status)
+    if (
+      order.deliveryStatus === 'shipped' ||
+      order.deliveryStatus === 'pending'
+    ) {
       order.deliveryStatus = 'revoked';
     }
     await order.save({ session: sessionTransaction });

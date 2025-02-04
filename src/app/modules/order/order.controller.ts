@@ -68,10 +68,11 @@ const getAllOrders = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-
 const getMyOrders = catchAsync(async (req: Request, res: Response) => {
   const { email } = req.user;
-  const orders = await orderService.getMyOrder(email);
+  const query = req.query;
+
+  const { orders, meta } = await orderService.getMyOrder(email, query);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -79,6 +80,20 @@ const getMyOrders = catchAsync(async (req: Request, res: Response) => {
     message:
       orders.length > 0 ? 'Orders retrieved successfully' : 'No orders found',
     data: orders || [],
+    meta,
+  });
+});
+
+const cancelOrder = catchAsync(async (req: Request, res: Response) => {
+  const { orderId } = req.params;
+  console.log('Inside cancel order==>>', orderId);
+  const updatedOrder = await orderService.cancelOrder(orderId);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Order cancelled successfully',
+    data: updatedOrder,
   });
 });
 
@@ -88,4 +103,5 @@ export const orderControllers = {
   getTotalRevenue,
   getAllOrders,
   getMyOrders,
+  cancelOrder,
 };

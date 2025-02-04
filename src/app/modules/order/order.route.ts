@@ -20,6 +20,13 @@ router.post(
 );
 
 router.patch(
+  '/:orderId/cancel',
+  AuthGuard(USER_ROLE.user),
+  validateRequest(OrderValidation.cancelOrderValidationSchema),
+  orderControllers.cancelOrder,
+);
+
+router.patch(
   '/:orderId',
   AuthGuard(USER_ROLE.user),
   validateRequest(OrderValidation.updateOrderValidationSchema),
