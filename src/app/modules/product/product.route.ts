@@ -20,7 +20,10 @@ router.post(
 
   productController.createProduct,
 );
+router.get('/best-sellers', productController.getBestSellingProduct);
+
 router.get('/:productId', productController.getProductById);
+
 router.put(
   '/:productId',
   validateRequest(ProductValidation.updateProductValidationSchema),

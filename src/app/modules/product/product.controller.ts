@@ -1,11 +1,10 @@
-import { Request, Response } from 'express';
 import productService from './product.service';
 import sendResponse from '../../utils/sendResponse';
 import catchAsync from '../../utils/catchAsync';
 import httpStatus from 'http-status';
 
 // Retirve all the products from database created
-const getAllProducts = catchAsync(async (req: Request, res: Response) => {
+const getAllProducts = catchAsync(async (req, res) => {
   const result = await productService.getAllProducts(req.query);
 
   sendResponse(res, {
@@ -18,7 +17,7 @@ const getAllProducts = catchAsync(async (req: Request, res: Response) => {
 });
 
 // Fetch product by id
-const getProductById = catchAsync(async (req: Request, res: Response) => {
+const getProductById = catchAsync(async (req, res) => {
   const { productId } = req.params;
   const product = await productService.getProductById(productId);
 
@@ -31,7 +30,7 @@ const getProductById = catchAsync(async (req: Request, res: Response) => {
 });
 
 // Create product
-const createProduct = catchAsync(async (req: Request, res: Response) => {
+const createProduct = catchAsync(async (req, res) => {
   const { product: productData } = req.body;
 
   const product = await productService.createProduct(req.file, productData);
@@ -45,7 +44,7 @@ const createProduct = catchAsync(async (req: Request, res: Response) => {
 });
 
 // update product data; partial data also could be updated
-const updateProduct = catchAsync(async (req: Request, res: Response) => {
+const updateProduct = catchAsync(async (req, res) => {
   const { productId } = req.params;
   const updateData = req.body;
 
@@ -63,7 +62,7 @@ const updateProduct = catchAsync(async (req: Request, res: Response) => {
 });
 
 // Delete product using product id
-const deleteProduct = catchAsync(async (req: Request, res: Response) => {
+const deleteProduct = catchAsync(async (req, res) => {
   const { productId } = req.params;
 
   await productService.deleteProduct(productId);
@@ -76,11 +75,23 @@ const deleteProduct = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getBestSellingProduct = catchAsync(async (req, res) => {
+  const products = await productService.getBestSellingProduct();
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Top 10 Best-Selling Products Retrieved Successfully',
+    data: products,
+  });
+});
+
 const productController = {
   updateProduct,
   deleteProduct,
   createProduct,
   getProductById,
   getAllProducts,
+  getBestSellingProduct,
 };
 export default productController;

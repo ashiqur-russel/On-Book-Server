@@ -142,6 +142,14 @@ const deleteProduct = async (productId: string): Promise<void> => {
   await Product.deleteOne({ _id: productId });
 };
 
+const getBestSellingProduct = async () => {
+  const bestSellingProducts = await Product.find({ isBestSold: true })
+    .sort({ soldCount: -1 })
+    .limit(10)
+    .exec();
+
+  return bestSellingProducts;
+};
 const productService = {
   getAllProducts,
   getProductById,
@@ -149,5 +157,6 @@ const productService = {
   updateProduct,
   searchProduct,
   deleteProduct,
+  getBestSellingProduct,
 };
 export default productService;
