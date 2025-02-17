@@ -1,5 +1,6 @@
 import mongoose, { Schema } from 'mongoose';
 import { IPayment } from './payment.interface';
+import { PAYMENT_STATUSES, REFUND_STATUSES } from './payment.constant';
 
 const PaymentSchema: Schema<IPayment> = new Schema(
   {
@@ -12,10 +13,17 @@ const PaymentSchema: Schema<IPayment> = new Schema(
       type: String,
       required: true,
     },
-    product: {
-      type: Schema.Types.ObjectId,
-      ref: 'Product',
-      required: [true, 'Product ID is required.'],
+    products: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Product',
+        required: [true, 'Product ID is required.'],
+      },
+    ],
+    refundStatus: {
+      type: String,
+      enum: Object.values(REFUND_STATUSES),
+      default: REFUND_STATUSES.NOT_REQUESTED,
     },
     order: {
       type: Schema.Types.ObjectId,
@@ -29,8 +37,12 @@ const PaymentSchema: Schema<IPayment> = new Schema(
     },
     status: {
       type: String,
-      enum: ['completed', 'refunded'],
-      default: 'completed',
+      enum: Object.values(PAYMENT_STATUSES),
+      default: PAYMENT_STATUSES.COMPLETED,
+    },
+    refundedAmount: {
+      type: Number,
+      default: 0,
     },
   },
   {
