@@ -1,4 +1,9 @@
 import { z } from 'zod';
+import {
+  DELIVERY_STATUSES,
+  ORDER_STATUSES,
+  REFUND_STATUSES,
+} from './order.constant';
 
 const createOrderValidationSchema = z.object({
   body: z.object({
@@ -25,10 +30,15 @@ const createOrderValidationSchema = z.object({
     totalPrice: z
       .number()
       .min(0, { message: 'Total price must be a non-negative number.' }),
+    status: z.enum(Object.values(ORDER_STATUSES) as [string, ...string[]]),
     deliveryStatus: z
-      .enum(['pending', 'shipped', 'delivered', 'cancelled', 'revoked'])
+      .enum(Object.values(DELIVERY_STATUSES) as [string, ...string[]])
       .optional()
       .default('pending'),
+    refundStatus: z
+      .enum(Object.values(REFUND_STATUSES) as [string, ...string[]])
+      .optional()
+      .default('not_requested'),
   }),
 });
 
@@ -57,10 +67,15 @@ const updateOrderValidationSchema = z.object({
       .number()
       .min(0, { message: 'Total price must be a non-negative number.' })
       .optional(),
+    status: z
+      .enum(Object.values(ORDER_STATUSES) as [string, ...string[]])
+      .optional(),
     deliveryStatus: z
-      .enum(['pending', 'shipped', 'delivered', 'cancelled', 'revoked'])
-      .optional()
-      .default('pending'),
+      .enum(Object.values(DELIVERY_STATUSES) as [string, ...string[]])
+      .optional(),
+    refundStatus: z
+      .enum(Object.values(REFUND_STATUSES) as [string, ...string[]])
+      .optional(),
   }),
 });
 

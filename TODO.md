@@ -30,6 +30,7 @@ totalPrice: 50,
 createdAt: new Date(),
 };
 ```
+
 2️⃣ Order Cancelled (Refund Requested)
 
 ```json
@@ -38,14 +39,14 @@ createdAt: new Date(),
   product: new Types.ObjectId(),
   user: new Types.ObjectId(),
   payment: new Types.ObjectId(),
-  status: "cancelled", 
-  deliveryStatus: "revoked", 
-  refundStatus: "requested", 
+  status: "cancelled",
+  deliveryStatus: "revoked",
+  refundStatus: "requested",
   quantity: 1,
   totalPrice: 30,
   createdAt: new Date(),
 };
-````
+```
 
 3️⃣ Partial Refund Issued for One Product
 Suppose an order had 3 products worth $30, and 1 product worth $12 was refunded.
@@ -65,20 +66,19 @@ Suppose an order had 3 products worth $30, and 1 product worth $12 was refunded.
 };
 ```
 
-
 ### Payment
 
 1️⃣ User Buys 3 Products ($30)
 
 ```json
 {
-  email: "user@example.com",
-  stripePaymentId: "pi_XXXXXX",
-  products: [new Types.ObjectId(), new Types.ObjectId(), new Types.ObjectId()],
-  order: new Types.ObjectId(),
-  user: new Types.ObjectId(),
-  status: "completed",
-  createdAt: new Date(),
+  "email": "user@example.com",
+  "stripePaymentId": "pi_XXXXXX",
+  "products": [new Types.ObjectId(), new Types.ObjectId(), new Types.ObjectId()],
+  "order": new Types.ObjectId(),
+  "user": new Types.ObjectId(),
+  "status": "completed",
+  "createdAt": new Date(),
 };
 ```
 
@@ -86,38 +86,39 @@ Suppose an order had 3 products worth $30, and 1 product worth $12 was refunded.
 
 ```json
 {
-  email: "user@example.com",
-  stripePaymentId: "pi_XXXXXX",
-  products: [new Types.ObjectId(), new Types.ObjectId(), new Types.ObjectId()],
-  order: new Types.ObjectId(),
-  user: new Types.ObjectId(),
-  status: "partially_refunded",
-  refundedAmount: 12,
-  createdAt: new Date(),
+  "email": "user@example.com",
+  "stripePaymentId": "pi_XXXXXX",
+  "products": [new Types.ObjectId(), new Types.ObjectId(), new Types.ObjectId()],
+  "order": new Types.ObjectId(),
+  "user": new Types.ObjectId(),
+  "status": "partially_refunded",
+  "refundedAmount": 12,
+  "createdAt": new Date(),
 };
 ```
 
 3️⃣ Full Refund (User Cancels Entire Order)
-```json
-{
-  email: "user@example.com",
-  stripePaymentId: "pi_XXXXXX",
-  products: [new Types.ObjectId(), new Types.ObjectId(), new Types.ObjectId()],
-  order: new Types.ObjectId(),
-  user: new Types.ObjectId(),
-  status: "refunded",
-  refundedAmount: 30, 
-  createdAt: new Date(),
-};
-```
-
-API Response for Payment shoild be initailly 
 
 ```json
 {
   "email": "user@example.com",
   "stripePaymentId": "pi_XXXXXX",
-  "products": ["64f123abc1234567890defab", "64f123abc1234567890defac"], 
+  "products": [new Types.ObjectId(), new Types.ObjectId(), new Types.ObjectId()],
+  "order": new Types.ObjectId(),
+  "user": new Types.ObjectId(),
+  "status": "refunded",
+  "refundedAmount": 30,
+  "createdAt": new Date(),
+};
+```
+
+API Response for Payment should be:
+
+```json
+{
+  "email": "user@example.com",
+  "stripePaymentId": "pi_XXXXXX",
+  "products": ["64f123abc1234567890defab", "64f123abc1234567890defac"],
   "order": "64f123abc1234567890defad",
   "user": "64f123abc1234567890defae",
   "status": "partially_refunded",
@@ -125,4 +126,3 @@ API Response for Payment shoild be initailly
   "refundedAmount": 12
 }
 ```
-

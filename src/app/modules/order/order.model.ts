@@ -1,5 +1,10 @@
 import mongoose, { Schema } from 'mongoose';
 import { IOrder } from './order.interface';
+import {
+  ORDER_STATUSES,
+  DELIVERY_STATUSES,
+  REFUND_STATUSES,
+} from './order.constant';
 
 const OrderSchema: Schema<IOrder> = new Schema(
   {
@@ -16,13 +21,14 @@ const OrderSchema: Schema<IOrder> = new Schema(
     payment: {
       type: Schema.Types.ObjectId,
       ref: 'Payment',
-      default: null,
+      required: true,
     },
     product: {
       type: Schema.Types.ObjectId,
       ref: 'Product',
       required: [true, 'Product ID is required.'],
     },
+
     totalPrice: {
       type: Number,
       required: [true, 'Total price is required.'],
@@ -30,13 +36,18 @@ const OrderSchema: Schema<IOrder> = new Schema(
     },
     status: {
       type: String,
-      enum: ['completed', 'cancelled'],
-      default: 'completed',
+      enum: Object.values(ORDER_STATUSES),
+      default: ORDER_STATUSES.COMPLETED,
     },
     deliveryStatus: {
       type: String,
-      enum: ['pending', 'shipped', 'delivered', 'revoked'],
-      default: 'pending',
+      enum: Object.values(DELIVERY_STATUSES),
+      default: DELIVERY_STATUSES.PENDING,
+    },
+    refundStatus: {
+      type: String,
+      enum: Object.values(REFUND_STATUSES),
+      default: REFUND_STATUSES.NOT_REQUESTED,
     },
     quantity: {
       type: Number,
