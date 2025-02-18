@@ -11,7 +11,6 @@ export interface IPayment {
   }[];
   user: Types.ObjectId;
   status: (typeof PAYMENT_STATUSES)[keyof typeof PAYMENT_STATUSES];
-  refundStatus?: (typeof REFUND_STATUSES)[keyof typeof REFUND_STATUSES];
   refundedAmount?: number;
   totalAmount: number;
   createdAt?: Date;

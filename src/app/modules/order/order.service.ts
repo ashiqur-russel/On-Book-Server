@@ -280,8 +280,6 @@ const cancelOrder = async (
         : orderObj,
     );
 
-    payment.refundStatus = REFUND_STATUSES.REQUESTED;
-
     await payment.save({ session });
     await order.save({ session });
 

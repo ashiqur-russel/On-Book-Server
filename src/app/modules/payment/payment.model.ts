@@ -24,11 +24,7 @@ const PaymentSchema: Schema<IPayment> = new Schema(
       type: Number,
       required: true,
     },
-    refundStatus: {
-      type: String,
-      enum: Object.values(REFUND_STATUSES),
-      default: REFUND_STATUSES.NOT_REQUESTED,
-    },
+
     orders: [
       {
         orderId: {

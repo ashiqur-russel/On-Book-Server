@@ -128,7 +128,6 @@ export const handleStripeWebhook = async (event: Stripe.Event) => {
         let totalAmount = 0;
 
         for (const item of products) {
-
           if (
             !item.price ||
             !item.quantity ||
@@ -227,8 +226,6 @@ export const handleStripeWebhook = async (event: Stripe.Event) => {
     } catch (error) {
       console.error('Stripe Session Retrieval Error:', error);
     }
-  } else {
-    console.info(`Unhandled event type: ${event.type}`);
   }
 };
 
