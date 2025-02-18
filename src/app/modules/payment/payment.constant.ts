@@ -8,6 +8,7 @@ export const REFUND_STATUSES = {
 
 export const PAYMENT_STATUSES = {
   COMPLETED: 'completed',
+  REFUND_ON_REVIEW: 'refund_on_review',
   PARTIALLY_REFUNDED: 'partially_refunded',
   REFUNDED: 'refunded',
 } as const;

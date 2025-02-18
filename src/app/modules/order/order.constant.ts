@@ -1,6 +1,7 @@
 export const ORDER_STATUSES = {
   COMPLETED: 'completed',
   CANCELLED: 'cancelled',
+  REVOKED: 'revoked',
 } as const;
 
 export const DELIVERY_STATUSES = {
@@ -8,6 +9,7 @@ export const DELIVERY_STATUSES = {
   SHIPPED: 'shipped',
   DELIVERED: 'delivered',
   REVOKED: 'revoked',
+  CANCELLED: 'cancelled',
 } as const;
 
 export const REFUND_STATUSES = {

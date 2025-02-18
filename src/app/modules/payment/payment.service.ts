@@ -6,6 +6,8 @@ import { Order } from '../order/order.model';
 import { User } from '../user/user.model';
 import AppError from '../../errors/handleAppError';
 import httpStatus from 'http-status';
+import { DELIVERY_STATUSES, ORDER_STATUSES } from '../order/order.constant';
+import { PAYMENT_STATUSES, REFUND_STATUSES } from './payment.constant';
 import { Product } from '../product/product.model';
 
 const stripe = new Stripe(config.stripe_secret_key as string, {});
@@ -15,17 +17,15 @@ export const createStripeCheckoutSession = async ({
   successUrl,
   cancelUrl,
   email,
-  product,
 }: {
-  items: { name: string; price: number; quantity: number }[];
+  items: { name: string; price: number; quantity: number; productId: string }[];
   successUrl: string;
   cancelUrl: string;
   email: string;
-  product: string;
 }) => {
   try {
-    if (!items || items.length === 0 || !email || !product) {
-      throw new Error(' Missing required parameters: items, email, product');
+    if (!items || items.length === 0 || !email) {
+      throw new Error('Missing required parameters: items, email');
     }
 
     const userData = await User.findOne({ email });
@@ -34,7 +34,14 @@ export const createStripeCheckoutSession = async ({
     }
 
     const userId = userData._id.toString();
-    const productQuantity = items[0].quantity;
+
+    const metadataProducts = JSON.stringify(
+      items.map((item) => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        price: item.price,
+      })),
+    );
 
     // Create Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({
@@ -45,21 +52,21 @@ export const createStripeCheckoutSession = async ({
           product_data: { name: item.name },
           unit_amount: item.price * 100,
         },
-        quantity: productQuantity,
+        quantity: item.quantity,
       })),
       mode: 'payment',
       success_url: successUrl,
       cancel_url: cancelUrl,
       metadata: {
-        userId: userId,
-        email: email,
-        productId: product,
-        quantity: productQuantity.toString(),
+        userId,
+        email,
+        products: metadataProducts,
       },
     });
 
     return session.id;
-  } catch {
+  } catch (error) {
+    console.error('Stripe Checkout Error:', error);
     throw new Error('Failed to create checkout session');
   }
 };
@@ -71,10 +78,25 @@ export const handleStripeWebhook = async (event: Stripe.Event) => {
     const metadata = session.metadata || {};
     const userId = metadata.userId;
     const email = metadata.email;
-    const productId = metadata.productId;
-    const quantity = parseInt(metadata.quantity, 10) || 1;
+    let products = [];
 
-    if (!userId || !email || !productId) {
+    try {
+      products = JSON.parse(metadata.products || '[]');
+
+      if (!Array.isArray(products) || products.length === 0) {
+        throw new Error('Invalid products metadata format.');
+      }
+    } catch (error) {
+      console.error('Error parsing products from metadata:', error);
+      return;
+    }
+
+    if (!userId || !email || products.length === 0) {
+      console.error('Missing required metadata fields:', {
+        userId,
+        email,
+        products,
+      });
       return;
     }
 
@@ -86,87 +108,127 @@ export const handleStripeWebhook = async (event: Stripe.Event) => {
       if (sessionDetails.payment_status !== 'paid') {
         throw new AppError(
           httpStatus.PRECONDITION_FAILED,
-          'Payment not completed. Skipping order creation.',
+          'Payment not completed.',
         );
-        return;
       }
 
       const sessionTransaction = await mongoose.startSession();
       sessionTransaction.startTransaction();
 
       try {
-        const order = new Order({
+        const productIds = products.map((p) => p.productId).filter(Boolean);
+
+        if (productIds.length === 0) {
+          throw new AppError(
+            httpStatus.BAD_REQUEST,
+            'No valid product IDs found.',
+          );
+        }
+
+        let totalAmount = 0;
+
+        for (const item of products) {
+
+          if (
+            !item.price ||
+            !item.quantity ||
+            isNaN(item.price) ||
+            isNaN(item.quantity)
+          ) {
+            throw new AppError(
+              httpStatus.BAD_REQUEST,
+              `Invalid price or quantity for product: ${JSON.stringify(item)}`,
+            );
+          }
+          totalAmount += Number(item.price) * Number(item.quantity);
+        }
+
+        if (isNaN(totalAmount) || totalAmount <= 0) {
+          throw new AppError(
+            httpStatus.BAD_REQUEST,
+            'Invalid totalAmount calculation.',
+          );
+        }
+
+        // Create Payment Record
+        const payment = new Payment({
           email,
-          product: productId,
+          products: productIds.map((id) => new mongoose.Types.ObjectId(id)),
           user: new mongoose.Types.ObjectId(userId),
-          quantity: quantity,
-          totalPrice: session.amount_total ? session.amount_total / 100 : 0,
-          deliveryStatus: 'pending',
+          totalAmount,
+          status: PAYMENT_STATUSES.COMPLETED,
+          stripePaymentId: session.payment_intent || '',
         });
 
-        await order.save({ session: sessionTransaction });
+        await payment.save({ session: sessionTransaction });
 
-        let payment = await Payment.findOne({
-          email,
-          product: productId,
-        }).session(sessionTransaction);
+        const orders = [];
+        for (const item of products) {
+          const { productId, quantity } = item;
 
-        if (!payment) {
-          payment = new Payment({
+          if (!mongoose.Types.ObjectId.isValid(productId)) {
+            throw new AppError(
+              httpStatus.BAD_REQUEST,
+              `Invalid Product ID: ${productId}`,
+            );
+          }
+
+          const product =
+            await Product.findById(productId).session(sessionTransaction);
+          if (!product) {
+            throw new AppError(
+              httpStatus.NOT_FOUND,
+              `Product ${productId} not found.`,
+            );
+          }
+
+          if (product.quantity < quantity) {
+            throw new AppError(
+              httpStatus.CONFLICT,
+              `Insufficient stock for product ${productId}.`,
+            );
+          }
+
+          //  Reduce stock
+          product.quantity -= quantity;
+          if (product.quantity === 0) {
+            product.inStock = false;
+          }
+          await product.save({ session: sessionTransaction });
+
+          const order = new Order({
             email,
-            product: productId,
+            product: new mongoose.Types.ObjectId(productId),
             user: new mongoose.Types.ObjectId(userId),
-            status: 'completed',
-            stripePaymentId: session.payment_intent || '',
-            order: order._id,
+            quantity: quantity,
+            totalPrice: Number(item.price) * Number(quantity),
+            deliveryStatus: DELIVERY_STATUSES.PENDING,
+            payment: payment._id,
           });
-          await payment.save({ session: sessionTransaction });
-        } else {
-          payment.status = 'completed';
-          payment.order = order._id;
-          await payment.save({ session: sessionTransaction });
+
+          await order.save({ session: sessionTransaction });
+          orders.push(order);
         }
 
-        const product =
-          await Product.findById(productId).session(sessionTransaction);
-        if (!product) {
-          throw new AppError(httpStatus.NOT_FOUND, 'Product not found');
-        }
-
-        product.quantity -= quantity;
-        if (product.soldCount !== undefined) {
-          product.soldCount += quantity;
-        } else {
-          product.soldCount = quantity;
-        }
-
-        if (product.quantity <= 0) {
-          product.quantity = 0;
-          product.inStock = false;
-        }
-
-        if (product.soldCount >= 10) {
-          product.isBestSold = true;
-        }
-
-        await product.save({ session: sessionTransaction });
-
-        // Update the Order with Payment ID
-        order.payment = payment._id;
-        await order.save({ session: sessionTransaction });
+        //  Update Payment Document with Order IDs
+        payment.orders = orders.map((order) => ({
+          orderId: order._id,
+          refundStatus: REFUND_STATUSES.NOT_REQUESTED,
+        }));
+        await payment.save({ session: sessionTransaction });
 
         await sessionTransaction.commitTransaction();
         sessionTransaction.endSession();
       } catch (error) {
         await sessionTransaction.abortTransaction();
         sessionTransaction.endSession();
-        console.error(' Order Creation Failed:', error);
+        console.error('Order Creation Failed:', error);
       }
     } catch (error) {
-      console.error(' Stripe Session Retrieval Error:', error);
+      console.error('Stripe Session Retrieval Error:', error);
     }
   } else {
-    console.log(` Unhandled event type: ${event.type}`);
+    console.info(`Unhandled event type: ${event.type}`);
   }
 };
 
@@ -184,48 +246,78 @@ export const issueRefund = async (paymentId: string) => {
       throw new AppError(httpStatus.NOT_FOUND, 'Payment record not found');
     }
 
-    if (payment.status === 'refunded') {
-      throw new AppError(httpStatus.CONFLICT, 'Payment already refunded');
+    if (payment.status === PAYMENT_STATUSES.REFUNDED) {
+      throw new AppError(httpStatus.CONFLICT, 'Payment already fully refunded');
     }
 
-    const order = await Order.findOne({ payment: payment._id }).session(
+    const orders = await Order.find({ payment: payment._id }).session(
       sessionTransaction,
     );
-    if (!order) {
-      throw new AppError(httpStatus.NOT_FOUND, 'Associated order not found');
+    if (!orders.length) {
+      throw new AppError(httpStatus.NOT_FOUND, 'No associated orders found');
     }
 
-    if (order.status !== 'cancelled') {
+    const cancelableOrders = orders.filter(
+      (order) =>
+        order.status === ORDER_STATUSES.CANCELLED &&
+        order.refundStatus === REFUND_STATUSES.REQUESTED,
+    );
+
+    if (cancelableOrders.length === 0) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
-        'Order must be cancelled before refunding',
+        'No canceled orders found for refunding',
       );
+    }
+
+    const refundAmount = cancelableOrders.reduce(
+      (sum, order) => sum + order.totalPrice,
+      0,
+    );
+
+    if (refundAmount <= 0) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Invalid refund amount');
     }
 
     const refund = await stripe.refunds.create({
       payment_intent: payment.stripePaymentId,
+      amount: refundAmount * 100,
     });
 
-    payment.status = 'refunded';
+    payment.refundedAmount = (payment.refundedAmount || 0) + refundAmount;
+
+    // Update the refund status for each order inside Payment
+    payment.orders.forEach((order) => {
+      if (
+        cancelableOrders.some((canceledOrder) =>
+          canceledOrder._id.equals(order.orderId),
+        )
+      ) {
+        order.refundStatus = REFUND_STATUSES.COMPLETED;
+      }
+    });
+
+    if (payment.refundedAmount >= payment.totalAmount) {
+      payment.status = PAYMENT_STATUSES.REFUNDED;
+    } else {
+      payment.status = PAYMENT_STATUSES.PARTIALLY_REFUNDED;
+    }
+
     await payment.save({ session: sessionTransaction });
 
-    // TODO:: delivery status should be cancelled
-    // TODO:: (change revoked to revoked if pending status)
-    if (
-      order.deliveryStatus === 'shipped' ||
-      order.deliveryStatus === 'pending'
-    ) {
-      order.deliveryStatus = 'revoked';
+    for (const order of cancelableOrders) {
+      order.refundStatus = REFUND_STATUSES.COMPLETED;
+      await order.save({ session: sessionTransaction });
     }
-    await order.save({ session: sessionTransaction });
 
     await sessionTransaction.commitTransaction();
     sessionTransaction.endSession();
 
-    return { success: true, refundId: refund.id };
+    return { success: true, refundId: refund.id, refundedAmount: refundAmount };
   } catch (error) {
     await sessionTransaction.abortTransaction();
     sessionTransaction.endSession();
+    console.error('Refund failed, rolling back transaction:', error);
     throw error;
   }
 };

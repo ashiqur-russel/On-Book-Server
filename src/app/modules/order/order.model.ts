@@ -21,7 +21,8 @@ const OrderSchema: Schema<IOrder> = new Schema(
     payment: {
       type: Schema.Types.ObjectId,
       ref: 'Payment',
-      required: true,
+      required: false,
+      default: null,
     },
     product: {
       type: Schema.Types.ObjectId,

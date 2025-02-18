@@ -18,16 +18,16 @@
 
 ```json
 {
-email: "user@example.com",
-product: new Types.ObjectId(),
-user: new Types.ObjectId(),
-payment: new Types.ObjectId(),
-status: "completed",
-deliveryStatus: "pending",
-refundStatus: "not_requested",
-quantity: 2,
-totalPrice: 50,
-createdAt: new Date(),
+"email": "user@example.com",
+"product": new Types.ObjectId(),
+"user": new Types.ObjectId(),
+"payment": new Types.ObjectId(),
+"status": "completed",
+"deliveryStatus": "pending",
+"refundStatus": "not_requested",
+"quantity": 2,
+"totalPrice": 50,
+"createdAt": new Date(),
 };
 ```
 
@@ -35,16 +35,16 @@ createdAt: new Date(),
 
 ```json
 {
-  email: "user@example.com",
-  product: new Types.ObjectId(),
-  user: new Types.ObjectId(),
-  payment: new Types.ObjectId(),
-  status: "cancelled",
-  deliveryStatus: "revoked",
-  refundStatus: "requested",
-  quantity: 1,
-  totalPrice: 30,
-  createdAt: new Date(),
+  "email": "user@example.com",
+  "product": new Types.ObjectId(),
+  "user": new Types.ObjectId(),
+  "payment": new Types.ObjectId(),
+  "status": "cancelled",
+  "deliveryStatus": "revoked",
+  "refundStatus": "requested",
+  "quantity": 1,
+  "totalPrice": 30,
+  "createdAt": new Date(),
 };
 ```
 
@@ -53,16 +53,16 @@ Suppose an order had 3 products worth $30, and 1 product worth $12 was refunded.
 
 ```json
 {
-  email: "user@example.com",
-  product: new Types.ObjectId(),
-  user: new Types.ObjectId(),
-  payment: new Types.ObjectId(),
-  status: "cancelled",
-  deliveryStatus: "revoked",
-  refundStatus: "completed", // Refund successfully issued
-  quantity: 2, // Remaining products
-  totalPrice: 18, // Updated total after partial refund
-  createdAt: new Date(),
+  "email": "user@example.com",
+  "product": new Types.ObjectId(),
+  "user": new Types.ObjectId(),
+  "payment": new Types.ObjectId(),
+  "status": "cancelled",
+  "deliveryStatus": "revoked",
+  "refundStatus": "completed", // Refund successfully issued
+  "quantity": 2, // Remaining products
+  "totalPrice": 18, // Updated total after partial refund
+  "createdAt": new Date(),
 };
 ```
 

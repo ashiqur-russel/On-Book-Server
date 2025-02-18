@@ -6,6 +6,12 @@ import AppError from '../../errors/handleAppError';
 import httpStatus from 'http-status';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { User } from '../user/user.model';
+import {
+  DELIVERY_STATUSES,
+  ORDER_STATUSES,
+  REFUND_STATUSES,
+} from './order.constant';
+import { Payment } from '../payment/payment.model';
 
 const getAllOrders = async (query: Record<string, unknown>) => {
   const orderQuery = new QueryBuilder(Order.find(), query)
@@ -206,7 +212,10 @@ const calculateRevenue = async (): Promise<number> => {
   return result[0]?.totalRevenue || 0;
 };
 
-const cancelOrder = async (orderId: string): Promise<IOrder | null> => {
+const cancelOrder = async (
+  orderId: string,
+  userRole: 'user' | 'admin',
+): Promise<IOrder | null> => {
   const session = await mongoose.startSession();
   session.startTransaction();
 
@@ -220,27 +229,65 @@ const cancelOrder = async (orderId: string): Promise<IOrder | null> => {
       throw new AppError(httpStatus.NOT_FOUND, 'Order not found.');
     }
 
-    if (order.deliveryStatus !== 'pending') {
+    if (order.deliveryStatus === DELIVERY_STATUSES.DELIVERED) {
       throw new AppError(
         httpStatus.CONFLICT,
-        'Only pending orders can be cancelled.',
+        'Delivered orders cannot be cancelled.',
       );
     }
 
-    const product = await Product.findById(order.product).session(session);
-    if (product) {
-      product.quantity += order.quantity;
-      product.inStock = true;
-      await product.save({ session });
+    const payment = await Payment.findById(order.payment).session(session);
+    if (!payment) {
+      throw new AppError(httpStatus.NOT_FOUND, 'Payment record not found.');
     }
 
-    order.deliveryStatus = 'revoked';
-    order.status = 'cancelled';
-    const updatedOrder = await order.save({ session });
+    if (userRole === 'user') {
+      if (order.deliveryStatus !== DELIVERY_STATUSES.PENDING) {
+        throw new AppError(
+          httpStatus.FORBIDDEN,
+          'You can only cancel pending orders.',
+        );
+      }
+
+      order.status = ORDER_STATUSES.CANCELLED;
+      order.deliveryStatus = DELIVERY_STATUSES.CANCELLED;
+      order.refundStatus = REFUND_STATUSES.REQUESTED;
+
+      // Restore stock
+      const product = await Product.findById(order.product).session(session);
+      if (product) {
+        product.quantity += order.quantity;
+        product.inStock = true;
+        await product.save({ session });
+      }
+    }
+
+    if (userRole === 'admin') {
+      if (
+        order.deliveryStatus === DELIVERY_STATUSES.PENDING ||
+        order.deliveryStatus === DELIVERY_STATUSES.SHIPPED
+      ) {
+        order.status = ORDER_STATUSES.REVOKED;
+        order.deliveryStatus = DELIVERY_STATUSES.REVOKED;
+        order.refundStatus = REFUND_STATUSES.REQUESTED;
+      }
+    }
+
+    //  Update the refund status inside the payment collection
+    payment.orders = payment.orders.map((orderObj) =>
+      orderObj.orderId.equals(order._id)
+        ? { ...orderObj, refundStatus: REFUND_STATUSES.REQUESTED }
+        : orderObj,
+    );
+
+    payment.refundStatus = REFUND_STATUSES.REQUESTED;
+
+    await payment.save({ session });
+    await order.save({ session });
 
     await session.commitTransaction();
     session.endSession();
-    return updatedOrder;
+    return order;
   } catch (error) {
     await session.abortTransaction();
     session.endSession();

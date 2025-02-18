@@ -20,16 +20,30 @@ const PaymentSchema: Schema<IPayment> = new Schema(
         required: [true, 'Product ID is required.'],
       },
     ],
+    totalAmount: {
+      type: Number,
+      required: true,
+    },
     refundStatus: {
       type: String,
       enum: Object.values(REFUND_STATUSES),
       default: REFUND_STATUSES.NOT_REQUESTED,
     },
-    order: {
-      type: Schema.Types.ObjectId,
-      ref: 'Order',
-      required: true,
-    },
+    orders: [
+      {
+        orderId: {
+          type: Schema.Types.ObjectId,
+          ref: 'Order',
+          required: true,
+        },
+        refundStatus: {
+          type: String,
+          enum: Object.values(REFUND_STATUSES),
+          default: REFUND_STATUSES.NOT_REQUESTED,
+        },
+      },
+    ],
+
     user: {
       type: Schema.Types.ObjectId,
       ref: 'User',
