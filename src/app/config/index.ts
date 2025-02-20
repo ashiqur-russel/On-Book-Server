@@ -2,10 +2,14 @@ import dotenv from 'dotenv';
 import path from 'path';
 
 dotenv.config({ path: path.join(process.cwd(), '.env') });
+const isProduction = process.env.NODE_ENV === 'production';
 
 export default {
   port: process.env.PORT,
-  database_url: process.env.DATABASE_URL,
+  database_url: isProduction
+    ? process.env.DATABASE_URL_CLOUD
+    : process.env.DATABASE_URL_LOCAL,
+
   environment: process.env.NODE_ENV,
   bcrypt_salt: process.env.BCRYPT_SALT,
   NODE_ENV: process.env.NODE_ENV,
