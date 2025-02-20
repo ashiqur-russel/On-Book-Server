@@ -86,8 +86,8 @@ const getMyOrders = catchAsync(async (req: Request, res: Response) => {
 
 const cancelOrder = catchAsync(async (req: Request, res: Response) => {
   const { orderId } = req.params;
-  console.log('Inside cancel order==>>', orderId);
-  const updatedOrder = await orderService.cancelOrder(orderId);
+  const userRole = req.user.role;
+  const updatedOrder = await orderService.cancelOrder(orderId, userRole);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

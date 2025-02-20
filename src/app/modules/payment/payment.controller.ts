@@ -12,9 +12,9 @@ export const createCheckoutSession = catchAsync(
   async (req: Request, res: Response) => {
     const { email } = req.user;
 
-    const { items, successUrl, cancelUrl, product } = req.body;
+    const { items, successUrl, cancelUrl } = req.body;
 
-    if (!items || !email || !product) {
+    if (!items || !email) {
       throw new Error('Missing required parameters: items, email, product');
     }
 
@@ -23,7 +23,6 @@ export const createCheckoutSession = catchAsync(
       successUrl,
       cancelUrl,
       email,
-      product,
     });
 
     if (!sessionId) {

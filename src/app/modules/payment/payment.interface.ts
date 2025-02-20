@@ -1,12 +1,18 @@
 import { Types } from 'mongoose';
+import { PAYMENT_STATUSES, REFUND_STATUSES } from './payment.constant';
 
 export interface IPayment {
   email: string;
   stripePaymentId: string;
-  product: Types.ObjectId;
-  order: Types.ObjectId;
+  products: Types.ObjectId[];
+  orders: {
+    orderId: Types.ObjectId;
+    refundStatus: (typeof REFUND_STATUSES)[keyof typeof REFUND_STATUSES];
+  }[];
   user: Types.ObjectId;
-  status: 'completed' | 'refunded';
+  status: (typeof PAYMENT_STATUSES)[keyof typeof PAYMENT_STATUSES];
+  refundedAmount?: number;
+  totalAmount: number;
   createdAt?: Date;
   updatedAt?: Date;
 }
