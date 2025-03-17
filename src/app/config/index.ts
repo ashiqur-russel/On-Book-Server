@@ -2,14 +2,14 @@ import dotenv from 'dotenv';
 import path from 'path';
 
 dotenv.config({ path: path.join(process.cwd(), '.env') });
-const isProduction = process.env.NODE_ENV === 'production';
+// const isProduction = process.env.NODE_ENV === 'production';
 
 export default {
   port: process.env.PORT,
-  database_url: isProduction
-    ? process.env.DATABASE_URL_CLOUD
-    : process.env.DATABASE_URL_LOCAL,
-
+  // database_url: isProduction
+  //   ? process.env.DATABASE_URL_CLOUD
+  //   : process.env.DATABASE_URL_LOCAL,
+  database_url: process.env.DATABASE_URL_CLOUD,
   environment: process.env.NODE_ENV,
   bcrypt_salt: process.env.BCRYPT_SALT,
   NODE_ENV: process.env.NODE_ENV,
@@ -20,4 +20,5 @@ export default {
   cloudinary_api_secret: process.env.CLOUDINARY_API_SECRET,
   stripe_secret_key: process.env.STRIPE_SECRET_KEY,
   stripe_webhook_secret: process.env.STRIPE_WEB_HOOK_SECRET,
+  stripe_webhook_secret_live: process.env.STRIPE_WEB_HOOK_SECRET,
 };

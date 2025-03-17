@@ -58,7 +58,7 @@ export const stripeWebhookHandler = catchAsync(
         event = stripe.webhooks.constructEvent(
           req.body as Buffer,
           sig,
-          config.stripe_webhook_secret as string,
+          config.stripe_webhook_secret_live as string,
         );
       } catch (err) {
         sendResponse(res, {
