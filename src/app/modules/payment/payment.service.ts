@@ -10,6 +10,7 @@ import { DELIVERY_STATUSES, ORDER_STATUSES } from '../order/order.constant';
 import { PAYMENT_STATUSES, REFUND_STATUSES } from './payment.constant';
 import { Product } from '../product/product.model';
 import { getIO } from '../../../socket';
+import { Notification } from '../notification/notification.model';
 
 const stripe = new Stripe(config.stripe_secret_key as string, {});
 
@@ -318,6 +319,13 @@ export const issueRefund = async (paymentId: string) => {
     getIO().to(userIdentifier).emit('refundNotification', {
       message: 'Your refund has been processed successfully!',
       refundAmount,
+    });
+
+    await Notification.create({
+      userId: payment.user,
+      message: `Your refund of $${refundAmount} has been processed.`,
+      type: 'refund',
+      status: 'unread',
     });
     console.log(`Refund notification sent to ${userIdentifier}`);
 

@@ -31,7 +31,7 @@ const moduleRoutes = [
     route: PaymentRoutes,
   },
   {
-    path: '/notification',
+    path: '/notifications',
     route: NotificationRouters,
   },
 ];
