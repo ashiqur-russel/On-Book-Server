@@ -85,8 +85,21 @@ const cancelOrderValidationSchema = z.object({
   }),
 });
 
+const changeDeliveryStatusValidationSchema = z.object({
+  body: z.object({
+    deliveryStatus: z.enum(
+      [DELIVERY_STATUSES.SHIPPED, DELIVERY_STATUSES.DELIVERED] as [
+        string,
+        ...string[],
+      ],
+      { required_error: 'Delivery status is required.' },
+    ),
+  }),
+});
+
 export const OrderValidation = {
   createOrderValidationSchema,
   updateOrderValidationSchema,
   cancelOrderValidationSchema,
+  changeDeliveryStatusValidationSchema,
 };

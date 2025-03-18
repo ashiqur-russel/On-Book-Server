@@ -45,4 +45,12 @@ router.get(
   orderControllers.getMyOrders,
 );
 
+router.patch(
+  '/:orderId/delivery-status',
+  AuthGuard(USER_ROLE.admin),
+  validateRequest(OrderValidation.changeDeliveryStatusValidationSchema),
+  orderControllers.changeDeliveryStatus,
+);
+
+
 export const OrderRouters = router;
