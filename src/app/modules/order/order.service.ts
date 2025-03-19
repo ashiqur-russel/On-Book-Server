@@ -293,6 +293,66 @@ const cancelOrder = async (
   }
 };
 
+const changeDeliveryStatus = async (
+  orderId: string,
+  newStatus: 'shipped' | 'delivered',
+): Promise<IOrder | null> => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  try {
+    if (!mongoose.Types.ObjectId.isValid(orderId)) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Invalid order ID.');
+    }
+
+    const order = await Order.findById(orderId).session(session);
+    if (!order) {
+      throw new AppError(httpStatus.NOT_FOUND, 'Order not found.');
+    }
+
+    const currentStatus = order.deliveryStatus;
+    if (currentStatus === DELIVERY_STATUSES.PENDING) {
+      if (newStatus !== DELIVERY_STATUSES.SHIPPED) {
+        throw new AppError(
+          httpStatus.BAD_REQUEST,
+          'From pending, order can only be changed to shipped.',
+        );
+      }
+    } else if (currentStatus === DELIVERY_STATUSES.SHIPPED) {
+      if (newStatus !== DELIVERY_STATUSES.DELIVERED) {
+        throw new AppError(
+          httpStatus.BAD_REQUEST,
+          'From shipped, order can only be changed to delivered.',
+        );
+      }
+    } else if (currentStatus === DELIVERY_STATUSES.DELIVERED) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        'Delivered orders cannot have their delivery status changed.',
+      );
+    } else {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        'Invalid current delivery status for this operation.',
+      );
+    }
+
+    order.deliveryStatus = newStatus;
+
+    if (newStatus === DELIVERY_STATUSES.DELIVERED) {
+      order.status = ORDER_STATUSES.COMPLETED;
+    }
+
+    await order.save({ session });
+    await session.commitTransaction();
+    session.endSession();
+    return order;
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
+  }
+};
+
 export const orderService = {
   getAllOrders,
   createOrder,
@@ -300,5 +360,6 @@ export const orderService = {
   calculateRevenue,
   getMyOrder,
   cancelOrder,
+  changeDeliveryStatus,
 };
 export default orderService;

@@ -97,6 +97,23 @@ const cancelOrder = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const changeDeliveryStatus = catchAsync(async (req: Request, res: Response) => {
+  const { orderId } = req.params;
+  const { deliveryStatus } = req.body; // expected to be either 'shipped' or 'delivered'
+
+  const updatedOrder = await orderService.changeDeliveryStatus(
+    orderId,
+    deliveryStatus,
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Delivery status updated successfully',
+    data: updatedOrder,
+  });
+});
+
 export const orderControllers = {
   createOrder,
   updateOrder,
@@ -104,4 +121,5 @@ export const orderControllers = {
   getAllOrders,
   getMyOrders,
   cancelOrder,
+  changeDeliveryStatus,
 };
