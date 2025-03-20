@@ -60,7 +60,17 @@ const updateProductValidationSchema = z.object({
   }),
 });
 
+export const applyOfferValidationSchema = z.object({
+  body: z.object({
+    productIds: z.array(z.string().length(24)),
+    offerRate: z.number().min(0).max(100),
+    start: z.string().refine((val) => !isNaN(Date.parse(val)), 'Invalid date'),
+    end: z.string().refine((val) => !isNaN(Date.parse(val)), 'Invalid date'),
+  }),
+});
+
 export const ProductValidation = {
   createProductValidationSchema,
   updateProductValidationSchema,
+  applyOfferValidationSchema,
 };

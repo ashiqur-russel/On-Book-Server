@@ -151,12 +151,23 @@ const getBestSellingProduct = async () => {
   return bestSellingProducts;
 };
 
-const applyOffer = async (productIds: string[], discount: number) => {
-  const result = await Product.updateMany(
+const applyOffer = async (
+  productIds: string[],
+  offerData: { offerRate: number; start: string; end: string },
+) => {
+  return await Product.updateMany(
     { _id: { $in: productIds } },
-    { $set: { hasOffer: true, offerRate: discount } },
+    {
+      $set: {
+        hasOffer: true,
+        offer: {
+          offerRate: offerData.offerRate,
+          start: new Date(offerData.start),
+          end: new Date(offerData.end),
+        },
+      },
+    },
   );
-  return result;
 };
 
 const productService = {

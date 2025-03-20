@@ -39,6 +39,7 @@ router.delete(
 router.post(
   '/offer',
   AuthGuard(USER_ROLE.admin),
+  validateRequest(ProductValidation.applyOfferValidationSchema),
   productController.offerProducts,
 );
 

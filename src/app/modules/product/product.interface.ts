@@ -6,6 +6,12 @@ export type TCategory =
   | 'Religious'
   | 'Thriller';
 
+export interface IOffer {
+  offerRate: number;
+  start: Date;
+  end: Date;
+}
+
 export interface IProduct {
   title: string;
   author: string;
@@ -22,6 +28,7 @@ export interface IProduct {
   rating?: number;
   productImg?: string;
   discountAmount?: number;
+  offer?: IOffer | null;
 }
 
 export interface UploadFile {

@@ -87,8 +87,13 @@ const getBestSellingProduct = catchAsync(async (req, res) => {
 });
 
 const offerProducts = catchAsync(async (req, res) => {
-  const { productIds, discount } = req.body;
-  const result = await productService.applyOffer(productIds, discount);
+  const { productIds, offerRate, start, end } = req.body;
+
+  const result = await productService.applyOffer(productIds, {
+    offerRate,
+    start,
+    end,
+  });
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

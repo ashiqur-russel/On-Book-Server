@@ -27,4 +27,6 @@ app.get('/', (req, res) => {
     .json({ message: 'Server is up and running!', api_start_point: '/api' });
 });
 
+import './app/utils/cronjob';
+
 export default app;

@@ -1,5 +1,14 @@
 import mongoose, { Schema } from 'mongoose';
-import { IProduct } from './product.interface';
+import { IOffer, IProduct } from './product.interface';
+
+const OfferSchema = new Schema<IOffer>(
+  {
+    offerRate: { type: Number, required: true, min: 0, max: 100 },
+    start: { type: Date, required: true },
+    end: { type: Date, required: true },
+  },
+  { _id: false },
+);
 
 export const ProductSchema: Schema<IProduct> = new Schema(
   {
@@ -47,6 +56,7 @@ export const ProductSchema: Schema<IProduct> = new Schema(
         message: '{VALUE} is not a valid category',
       },
     },
+    offer: { type: OfferSchema, default: null },
     description: {
       type: String,
       trim: true,
