@@ -77,6 +77,8 @@ const updateOrderValidationSchema = z.object({
       .enum(Object.values(REFUND_STATUSES) as [string, ...string[]])
       .optional(),
   }),
+  rating: z.number().int().min(1).max(5).optional(),
+  review: z.string().optional(),
 });
 
 const cancelOrderValidationSchema = z.object({

@@ -86,6 +86,18 @@ const getBestSellingProduct = catchAsync(async (req, res) => {
   });
 });
 
+const offerProducts = catchAsync(async (req, res) => {
+  const { productIds, discount } = req.body;
+  const result = await productService.applyOffer(productIds, discount);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Offers applied successfully',
+    data: result,
+  });
+});
+
 const productController = {
   updateProduct,
   deleteProduct,
@@ -93,5 +105,6 @@ const productController = {
   getProductById,
   getAllProducts,
   getBestSellingProduct,
+  offerProducts,
 };
 export default productController;

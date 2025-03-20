@@ -150,6 +150,15 @@ const getBestSellingProduct = async () => {
 
   return bestSellingProducts;
 };
+
+const applyOffer = async (productIds: string[], discount: number) => {
+  const result = await Product.updateMany(
+    { _id: { $in: productIds } },
+    { $set: { hasOffer: true, offerRate: discount } },
+  );
+  return result;
+};
+
 const productService = {
   getAllProducts,
   getProductById,
@@ -158,5 +167,6 @@ const productService = {
   searchProduct,
   deleteProduct,
   getBestSellingProduct,
+  applyOffer,
 };
 export default productService;

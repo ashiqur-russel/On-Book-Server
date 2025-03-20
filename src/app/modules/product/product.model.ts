@@ -20,6 +20,18 @@ export const ProductSchema: Schema<IProduct> = new Schema(
       required: false,
       min: [0, 'Discount must be a positive number'],
     },
+    rating: {
+      type: Number,
+      required: false,
+      min: [0, 'Rating must be a positive number'],
+      max: [5, 'Rating must be a number between 0 and 5'],
+    },
+    offerRate: {
+      type: Number,
+      required: false,
+      min: [0, 'Offer Rate must be a positive number'],
+      max: [100, 'Offer Rate must be a number between 0 and 100'],
+    },
     category: {
       type: String,
       required: [true, 'Category is required'],

@@ -29,6 +29,15 @@ const OrderSchema: Schema<IOrder> = new Schema(
       ref: 'Product',
       required: [true, 'Product ID is required.'],
     },
+    ratings: {
+      type: Number,
+      min: [1, 'Ratings must be at least 1.'],
+      max: [5, 'Ratings must be at most 5.'],
+    },
+    review: {
+      type: String,
+      trim: true,
+    },
 
     totalPrice: {
       type: Number,

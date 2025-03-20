@@ -1,5 +1,5 @@
 {
-  "name": "book-shop",
+  "name": "book-shop-server",
   "version": "1.0.0",
   "description": "Next Level Course Assignemnt No 2.",
   "main": "index.js",

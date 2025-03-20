@@ -45,6 +45,8 @@ const updateProductValidationSchema = z.object({
     author: z.string().optional(),
     price: z.number().min(0).optional(),
     discountAmount: z.number().min(0).optional(),
+    rating: z.number().min(0).max(5).optional(),
+    offerRate: z.number().min(0).max(100).optional(),
 
     category: z
       .enum(['Fiction', 'Science', 'SelfDevelopment', 'Poetry', 'Religious'])

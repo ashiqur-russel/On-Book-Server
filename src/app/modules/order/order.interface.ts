@@ -15,6 +15,8 @@ export interface IOrder {
   refundStatus?: (typeof REFUND_STATUSES)[keyof typeof REFUND_STATUSES];
   quantity: number;
   totalPrice: number;
+  ratings?: number;
+  review?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }

@@ -36,4 +36,10 @@ router.delete(
   productController.deleteProduct,
 );
 
+router.post(
+  '/offer',
+  AuthGuard(USER_ROLE.admin),
+  productController.offerProducts,
+);
+
 export const ProductRouters = router;

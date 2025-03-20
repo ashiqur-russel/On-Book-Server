@@ -18,6 +18,8 @@ export interface IProduct {
   isBestSold?: boolean;
   hasOffer?: boolean;
   isFeatured?: boolean;
+  offerRate?: number;
+  rating?: number;
   productImg?: string;
   discountAmount?: number;
 }
