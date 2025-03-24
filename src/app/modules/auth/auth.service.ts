@@ -4,7 +4,7 @@ import { JwtPayload } from 'jsonwebtoken';
 import config from '../../config';
 import { User } from '../user/user.model';
 import { TLoginUser } from './auth.interface';
-import { createToken } from './auth.utils';
+import { createToken, verifyToken } from './auth.utils';
 import AppError from '../../errors/handleAppError';
 
 const loginUser = async (payload: TLoginUser) => {
@@ -29,8 +29,52 @@ const loginUser = async (payload: TLoginUser) => {
     config.jwt_access_expires_in as string,
   );
 
+  const refreshToken = createToken(
+    jwtPayload,
+    config.jwt_refresh_secret as string,
+    config.jwt_refresh_expires_in as string,
+  );
+
   return {
     accessToken,
+    refreshToken,
+  };
+};
+
+const refreshToken = async (token: string) => {
+  let verifiedToken = null;
+  try {
+    verifiedToken = verifyToken(token, config.jwt_refresh_secret as string);
+  } catch {
+    throw new AppError(httpStatus.FORBIDDEN, 'Invalid Refresh Token');
+  }
+
+  const { userId } = verifiedToken;
+
+  const isUserExist = await User.findById(userId);
+  if (!isUserExist) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User does not exist');
+  }
+
+  if (!isUserExist) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'User is not active');
+  }
+
+  const jwtPayload = {
+    userId: isUserExist._id.toString(),
+    name: isUserExist.name as string,
+    email: isUserExist.email as string,
+    role: isUserExist.role,
+  };
+
+  const newAccessToken = createToken(
+    jwtPayload,
+    config.jwt_access_secret as string,
+    config.jwt_access_expires_in as string,
+  );
+
+  return {
+    accessToken: newAccessToken,
   };
 };
 
@@ -67,4 +111,5 @@ const changePassword = async (
 export const AuthServices = {
   loginUser,
   changePassword,
+  refreshToken,
 };
