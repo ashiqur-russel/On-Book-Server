@@ -5,6 +5,7 @@ import { UserRoutes } from '../modules/user/user.route';
 import { AuthRoutes } from '../modules/auth/auth.route';
 import { PaymentRoutes } from '../modules/payment/payment.route';
 import { NotificationRouters } from '../modules/notification/notification.route';
+import { CronRouters } from '../modules/cron/cron.route';
 
 const router = Router();
 
@@ -33,6 +34,10 @@ const moduleRoutes = [
   {
     path: '/notifications',
     route: NotificationRouters,
+  },
+  {
+    path: '/cron',
+    route: CronRouters,
   },
 ];
 

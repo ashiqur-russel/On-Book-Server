@@ -41,6 +41,7 @@
   "dependencies": {
     "@types/cookie-parser": "^1.4.8",
     "@types/http-status": "^0.2.30",
+    "@vercel/node": "^5.1.14",
     "bcrypt": "^5.1.1",
     "cloudinary": "^2.5.1",
     "cookie-parser": "^1.4.7",
